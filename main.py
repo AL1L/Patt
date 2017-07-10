@@ -75,7 +75,8 @@ async def on_message(msg):
     if msg.content == '<@{}>'.format(client.user.id):
         await client.delete_message(msg)
         await client.send_typing(msg.channel)
-        await client.send_message(msg.channel, '<@{}>: This guilds prefix is `{}`'.format(msg.author.id, prefix))
+        await client.send_message(msg.channel, u.lang('', msg.author)['guild_prefix'].format(user_id=msg.author.id,
+                                                                                             cmd_prefix=prefix))
         return
 
     # Else, check if the message was sent with the required prefix
