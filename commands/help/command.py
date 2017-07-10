@@ -5,7 +5,7 @@ import utils as u
 
 
 async def execute(context: u.CommandContext):
-    commands_directory = "C:/Users/Allen/DiscordPyBot/commands/"
+    commands_directory = "C:/Users/user1/DiscordPyBot/commands/"
     help_list = "Here is the list of commands:\n\n"
     for dir in get_sub_dirs(commands_directory):
         command_config_file = Path("{}{}/cmd.json".format(commands_directory, dir))

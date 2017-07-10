@@ -1,3 +1,4 @@
 .idea/
 commands/__pycache__/
 *.db
+*.bat

@@ -1,4 +1,5 @@
 import json
+import discord
 from pathlib import Path
 
 
@@ -19,9 +20,9 @@ def get_user_lang(user):
 
 
 def lang(command, user):
-    commands_directory = "C:/Users/Allen/DiscordPyBot/commands/"
+    commands_directory = "C:/Users/user1/DiscordPyBot/commands/"
     if command is '':
-        commands_directory = "C:/Users/Allen/DiscordPyBot"
+        commands_directory = "C:/Users/user1/DiscordPyBot"
     user_lang = get_user_lang(user)
     command_config_file = Path("{}{}/lang.json".format(commands_directory, command))
 

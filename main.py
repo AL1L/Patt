@@ -88,7 +88,7 @@ async def on_message(msg):
         elif not msgParts[0].isalnum():
             return
 
-        commands_directory = "C:/Users/Allen/DiscordPyBot/commands/"
+        commands_directory = "C:/Users/user1/DiscordPyBot/commands/"
 
         command_config_file = Path("{}{}/cmd.json".format(commands_directory, msgParts[0]))
 
