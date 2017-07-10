@@ -1,0 +1,12 @@
+{
+  "name": "Test Command",
+  "short_name": "test",
+  "usage": "%{cmd_prefix}test",
+  "main": "command.py",
+  "description": "Testing command for AL_1",
+  "permissions": [
+    "user:152953323417239552",
+    "send_messages",
+    "read_messages"
+  ]
+}

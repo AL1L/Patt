@@ -1,0 +1,11 @@
+{
+  "name": "Count My Messages",
+  "short_name": "count-me",
+  "usage": "%{cmd_prefix}count-me",
+  "main": "command.py",
+  "description": "Counts all your messages in the current channel",
+  "permissions": [
+    "send_messages",
+    "read_messages"
+  ]
+}

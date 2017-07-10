@@ -1,0 +1,11 @@
+{
+  "name": "---",
+  "short_name": "---",
+  "usage": "---",
+  "main": "command.py",
+  "description": "---",
+  "permissions": [
+    "send_messages",
+    "read_messages"
+  ]
+}
