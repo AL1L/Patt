@@ -113,7 +113,7 @@ async def on_message(msg):
 
             # Log the command
             print('CMD "{}#{}" ({}) ran "{}" on the guild "{}" ({})'
-                  .format(msg.author.name, msg.author.discriminator, msg.author.id, name, msg.server.name,
+                  .format(msg.author.name, msg.author.discriminator, msg.author.id, msgParts[0], msg.server.name,
                           msg.server.id))
 
             # Unimport the command module, i don't know if this even works.
