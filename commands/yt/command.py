@@ -1,7 +1,9 @@
 import re
 import discord
+import utils as u
 
-async def execute(context):
+
+async def execute(context: u.CommandContext):
     msg = context.message
     client = context.client
     if msg.author.voice.voice_channel is None:
@@ -27,4 +29,4 @@ async def execute(context):
     player = await voice.create_ytdl_player(context.args[1])
     player.start()
 
-# !yt https://www.youtube.com/watch?v=uq7OAmzmGxo
+    # !yt https://www.youtube.com/watch?v=uq7OAmzmGxo

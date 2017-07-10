@@ -1,7 +1,7 @@
 {
   "name": "Chuck Norris jokes",
   "short_name": "chuck-norris",
-  "usage": "%{cmd_prefix}chuck-norris",
+  "usage": "{cmd_prefix}chuck-norris",
   "main": "command.py",
   "description": "Random Chuck Norris jokes",
   "permissions": [

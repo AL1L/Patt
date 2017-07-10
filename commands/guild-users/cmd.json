@@ -1,7 +1,7 @@
 {
   "name": "Amount of users in guild",
   "short_name": "users-amount",
-  "usage": "%{cmd_prefix}guild-users",
+  "usage": "{cmd_prefix}guild-users",
   "main": "command.py",
   "description": "Shows how many users are in the current guild",
   "permissions": [

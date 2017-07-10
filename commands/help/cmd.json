@@ -1,7 +1,7 @@
 {
   "name": "Command List",
   "short_name": "command-list",
-  "usage": "%{cmd_prefix}help",
+  "usage": "{cmd_prefix}help",
   "main": "command.py",
   "description": "Shows a list of commands I can do",
   "permissions": [

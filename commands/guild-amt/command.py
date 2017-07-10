@@ -1,4 +1,7 @@
-async def execute(context):
+import utils as u
+
+
+async def execute(context: u.CommandContext):
     msg = context.message
     client = context.client
     context.cursor.execute("SELECT * FROM guilds")

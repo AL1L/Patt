@@ -1,7 +1,7 @@
 {
   "name": "Evaluate",
   "short_name": "evaluate",
-  "usage": "%{cmd_prefix}eval",
+  "usage": "{cmd_prefix}eval",
   "main": "command.py",
   "description": "Do some maths",
   "permissions": [

@@ -1,7 +1,7 @@
 {
   "name": "Theartex Announcements",
   "short_name": "Artex",
-  "usage": "%{cmd_prefix}artex",
+  "usage": "{cmd_prefix}artex",
   "main": "command.py",
   "description": "Latest announcement from https://theartex.net/",
   "permissions": [

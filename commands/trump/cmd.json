@@ -1,7 +1,7 @@
 {
   "name": "Donald Trump quote",
   "short_name": "trump-quote",
-  "usage": "%{cmd_prefix}trump",
+  "usage": "{cmd_prefix}trump",
   "main": "command.py",
   "description": "Random Donald Trump quote",
   "permissions": [

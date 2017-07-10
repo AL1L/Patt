@@ -1,7 +1,7 @@
 {
   "name": "Set Command Prefix",
   "short_name": "set-prefix",
-  "usage": "%{cmd_prefix}set-prefix",
+  "usage": "{cmd_prefix}set-prefix",
   "main": "command.py",
   "description": "Sets the current guild's command prefix.",
   "permissions": [

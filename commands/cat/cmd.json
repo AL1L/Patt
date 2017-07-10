@@ -1,7 +1,7 @@
 {
   "name": "Random.cat",
   "short_name": "Cat",
-  "usage": "%{cmd_prefix}cat",
+  "usage": "{cmd_prefix}cat",
   "main": "command.py",
   "description": "Random cat picture",
   "permissions": [

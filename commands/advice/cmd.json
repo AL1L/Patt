@@ -1,7 +1,7 @@
 {
   "name": "Advice Slips",
   "short_name": "Advice",
-  "usage": "%{cmd_prefix}advice",
+  "usage": "{cmd_prefix}advice",
   "main": "command.py",
   "description": "Some helpful random advice.",
   "permissions": [

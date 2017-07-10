@@ -1,4 +1,7 @@
-async def execute(context):
+import utils as u
+
+
+async def execute(context: u.CommandContext):
     msg = context.message
     client = context.client
     counter = 0
@@ -7,4 +10,5 @@ async def execute(context):
         if log.author == msg.author:
             counter += 1
     plus = ('', '+')[counter == 100]
-    await client.edit_message(tmp, '<@{}>: You have {}{} messages in this channel.'.format(msg.author.id, plus, counter))
+    await client.edit_message(tmp,
+                              '<@{}>: You have {}{} messages in this channel.'.format(msg.author.id, plus, counter))

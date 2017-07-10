@@ -1,7 +1,7 @@
 {
   "name": "Amount of guilds in",
   "short_name": "guild-amount",
-  "usage": "%{cmd_prefix}guild-amt",
+  "usage": "{cmd_prefix}guild-amt",
   "main": "command.py",
   "description": "Shows how many guilds I am in",
   "permissions": [

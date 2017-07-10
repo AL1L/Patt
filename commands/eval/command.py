@@ -1,15 +1,16 @@
 import discord
 import time
+import utils as u
 
 
-async def execute(context):
+async def execute(context: u.CommandContext):
     context.args = context.args[1:]
     embed = discord.Embed()
     embed.title = "Evaluate"
     embed.color = discord.Colour.green()
     evaluate = ""
     for str in context.args:
-       evaluate = evaluate + str + " "
+        evaluate = evaluate + str + " "
     if evaluate is "":
         evaluate = "\"\""
     evaluateOrg = evaluate

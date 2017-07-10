@@ -5,6 +5,7 @@ import time
 import sys
 import importlib
 import sqlite3 as lite
+import json
 from pathlib import Path
 
 print('------------------------------')
@@ -85,39 +86,60 @@ async def on_message(msg):
             return
         elif not msgParts[0].isalnum():
             return
-        command_script = Path("C:/Users/Allen/DiscordPyBot/commands/{}/command.py".format(msgParts[0]))
-        if command_script.is_file():
-            # Create command context
-            context = u.CommandContext()
-            context.client = client
-            context.message = msg
-            context.args = msgParts
-            context.cursor = cur
-            context.database = db
-            context.name = msgParts[0]
-            context.client_server_data = row
-            context.start_time = start_ms_time
 
-            # Delete the users message and start typing
-            await client.delete_message(msg)
-            await client.send_typing(msg.channel)
+        commands_directory = "C:/Users/Allen/DiscordPyBot/commands/"
 
-            # Include and reload command module
-            package = "commands.{}".format(msgParts[0])
-            name = 'command'
-            command_sk = getattr(__import__(package, fromlist=[name]), name)
-            importlib.reload(command_sk)
+        command_config_file = Path("{}{}/cmd.json".format(commands_directory, msgParts[0]))
 
-            # Execute the command module
-            await command_sk.execute(context)
+        if not command_config_file.is_file():
+            return
 
-            # Log the command
-            print('CMD "{}#{}" ({}) ran "{}" on the guild "{}" ({})'
-                  .format(msg.author.name, msg.author.discriminator, msg.author.id, msgParts[0], msg.server.name,
-                          msg.server.id))
+        command_config_text = command_config_file.read_text()
+        command_config_json = json.loads(command_config_text)
 
-            # Unimport the command module, i don't know if this even works.
-            del command_sk
+        if command_config_json is None:
+            return
+        elif command_config_json['main'] is None:
+            print("Main was not found in the command config for {}".format(msgParts[0]))
+            return
+
+        command_script = Path("{}{}/{}".format(commands_directory, msgParts[0], command_config_json['main']))
+
+        if not command_script.is_file():
+            print('"{}" was not found for the command "{}"'.format(command_config_json['main'], msgParts[0]))
+            return
+
+        # Create command context
+        context = u.CommandContext()
+        context.client = client
+        context.message = msg
+        context.args = msgParts
+        context.cursor = cur
+        context.database = db
+        context.name = msgParts[0]
+        context.client_server_data = row
+        context.start_time = start_ms_time
+
+        # Delete the users message and start typing
+        await client.delete_message(msg)
+        await client.send_typing(msg.channel)
+
+        # Include and reload command module
+        package = "commands.{}".format(msgParts[0])
+        name = 'command'
+        command_sk = getattr(__import__(package, fromlist=[name]), name)
+        importlib.reload(command_sk)
+
+        # Execute the command module
+        await command_sk.execute(context)
+
+        # Log the command
+        print('CMD "{}#{}" ({}) ran "{}" on the guild "{}" ({})'
+              .format(msg.author.name, msg.author.discriminator, msg.author.id, msgParts[0], msg.server.name,
+                      msg.server.id))
+
+        # Unimport the command module, i don't know if this even works.
+        del command_sk
 
 
 # When Patt joins a server

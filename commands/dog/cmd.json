@@ -1,7 +1,7 @@
 {
   "name": "Random.dog",
   "short_name": "Dog",
-  "usage": "%{cmd_prefix}dog",
+  "usage": "{cmd_prefix}dog",
   "main": "command.py",
   "description": "Random dog picture",
   "permissions": [
