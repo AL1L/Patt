@@ -1,12 +1,13 @@
 import aiohttp
 import utils as u
 
+
 class Command(u.Command):
     name = "ron"
     description = "Random Ron Swanson quote"
     usage = '{cmd_prefix}ron'
     type = "none"
-    
+
     @staticmethod
     async def execute(context: u.CommandContext):
         msg = context.message

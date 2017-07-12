@@ -1,11 +1,12 @@
 import utils as u
 
+
 class Command(u.Command):
     name = "guild-amt"
     description = "Shows how many guilds I am in"
     usage = '{cmd_prefix}guild-amt'
     type = "none"
-    
+
     @staticmethod
     async def execute(context: u.CommandContext):
         msg = context.message

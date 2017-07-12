@@ -88,7 +88,6 @@ async def on_message(msg):
         elif not msgParts[0].replace('-', '').isalnum():
             return
 
-        
         # Create command context
         context = u.CommandContext()
         context.client = client
@@ -99,15 +98,15 @@ async def on_message(msg):
         context.name = msgParts[0]
         context.client_server_data = row
         context.start_time = start_ms_time
-        
+
         command = u.get_command(context.name)
-        
+
         if command is None:
             return
-            
+
         await client.delete_message(msg)
         await client.send_typing(msg.channel)
-        
+
         # Check permissions
         has_perm = u.has_permission(context.name, context.message)
         if not has_perm[0]:
@@ -119,9 +118,11 @@ async def on_message(msg):
             await command.execute(context)
         except Exception as e:
             await client.send_message(msg.channel, '<@{}>: There was an error! `{}`'.format(msg.author.id, e))
-        
+
         # Log the command
-        print('CMD "{}#{}" ({}) ran "{}" on the guild "{}" ({})'.format(msg.author.name, msg.author.discriminator, msg.author.id, msgParts[0], msg.server.name, msg.server.id))
+        print('CMD "{}#{}" ({}) ran "{}" on the guild "{}" ({})'.format(msg.author.name, msg.author.discriminator,
+                                                                        msg.author.id, msgParts[0], msg.server.name,
+                                                                        msg.server.id))
 
 
 # When Patt joins a server

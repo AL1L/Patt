@@ -2,12 +2,13 @@ import discord
 import time
 import utils as u
 
+
 class Command(u.Command):
     name = "eval"
     description = "Do some maths"
     usage = '{cmd_prefix}eval'
     type = "none"
-    
+
     @staticmethod
     async def execute(context: u.CommandContext):
         embed = discord.Embed()
@@ -52,14 +53,14 @@ class Command(u.Command):
         elif "context.cursor" in evaluate.lower():
             embed.color = discord.Colour.orange()
             evaluate = "\"That is not allowed! (context.cursor)\""
-    
+
         if "217617036749176833--" in context.message.author.id:  # DotRar#6028
             embed.color = discord.Colour.dark_red()
             evaluate = "\"You are banned form using this command\""
         elif "146096009246670859--" in context.message.author.id:  # Joey#3518
             embed.color = discord.Colour.dark_red()
             evaluate = "\"You are banned form using this command\""
-    
+
         try:
             evaluation = eval(evaluate)
         except Exception as e:

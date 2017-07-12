@@ -9,7 +9,7 @@ class Command(u.Command):
     description = "Shows a list of commands I can do"
     usage = '{cmd_prefix}help'
     type = "none"
-    
+
     @staticmethod
     async def execute(context: u.CommandContext):
         commands_directory = "C:/Users/user1/DiscordPyBot/commands/"
@@ -17,30 +17,30 @@ class Command(u.Command):
         max_len = 0
         for dir in get_sub_dirs(commands_directory):
             command = u.get_command(dir)
-                
+
             if command.type == 'hidden':
                 continue
-    
+
             usage = command.usage.format(cmd_prefix=context.client_server_data[1])
             if len(usage) > max_len:
                 max_len = len(usage)
-                
+
         for dir in get_sub_dirs(commands_directory):
             command = u.get_command(dir)
-                
+
             if command.type == 'hidden':
                 continue
-    
+
             usage = command.usage.format(cmd_prefix=context.client_server_data[1])
-    
-            spaces = ' ' * (max_len-len(usage))
+
+            spaces = ' ' * (max_len - len(usage))
             help_list = help_list + "" + usage + spaces + " - " + command.description + '\n'
-    
+
         help_list = help_list
-    
+
         await context.client.send_message(context.message.author, '{}```'.format(help_list))
         await context.client.send_message(context.message.channel, '<@{}>: I DMed you the help.'
-                                        .format(context.message.author.id))
+                                          .format(context.message.author.id))
         return
 
 

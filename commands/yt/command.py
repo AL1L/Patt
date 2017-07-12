@@ -2,12 +2,13 @@ import re
 import discord
 import utils as u
 
+
 class Command(u.Command):
     name = "yt"
     description = "---"
     usage = '{cmd_prefix}yt'
     type = "hidden"
-    
+
     @staticmethod
     async def execute(context: u.CommandContext):
         msg = context.message
@@ -34,5 +35,5 @@ class Command(u.Command):
         voice = await client.join_voice_channel(voice_channel)
         player = await voice.create_ytdl_player(context.args[1])
         player.start()
-    
+
         # !yt https://www.youtube.com/watch?v=uq7OAmzmGxo
