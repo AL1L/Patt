@@ -3,10 +3,7 @@ import utils as u
 import logging
 import time
 import sys
-import importlib
 import sqlite3 as lite
-import json
-from pathlib import Path
 
 print('------------------------------')
 print('Parameters: {}'.format(sys.argv))
