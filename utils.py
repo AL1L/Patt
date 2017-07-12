@@ -71,24 +71,19 @@ def lang(command, user):
     return lang_keys
 
 
-def has_permission(command, msg):
-    commands_directory = "C:/Users/user1/DiscordPyBot/commands/"
+def has_permission(cmd, msg):
+    command = get_command(cmd)
 
-    command_config_file = Path("{}{}/cmd.json".format(commands_directory, command))
-
-    if not command_config_file.is_file():
-        return [True]
-
-    command_config_text = command_config_file.read_text()
-    command_config_json = json.loads(command_config_text)
-
-    if command_config_json['permissions'] is not None:
-        req_perms = command_config_json['permissions']
+    if command.permissions is not None:
+        req_perms = command.permissions
         user_perms = msg.channel.permissions_for(msg.author)
-        for req_perm in command_config_json['permissions']:
+        for req_perm in req_perms:
             if req_perm.startswith('user:'):
                 if msg.author.id not in req_perm.split(':')[1]:
-                    return [False, 'specific_user'.upper()]
+                    return [False, 'invalid_user'.upper()]
+            elif req_perm.startswith('guild:'):
+                if msg.server.id not in req_perm.split(':')[1]:
+                    return [False, 'invalid_guild'.upper()]
             else:
                 if not getattr(user_perms, req_perm):
                     return [False, req_perm.upper()]

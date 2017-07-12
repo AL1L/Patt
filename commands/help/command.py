@@ -15,8 +15,10 @@ class Command(u.Command):
         commands_directory = "C:/Users/user1/DiscordPyBot/commands/"
         help_list = "Here is the list of commands:\n\n```"
         max_len = 0
-        for dir in get_sub_dirs(commands_directory):
-            command = u.get_command(dir)
+        for cmd_name in get_sub_dirs(commands_directory):
+            if not u.has_permission(cmd_name, context.message)[0]:
+                continue
+            command = u.get_command(cmd_name)
 
             if command.type == 'hidden':
                 continue
@@ -25,8 +27,10 @@ class Command(u.Command):
             if len(usage) > max_len:
                 max_len = len(usage)
 
-        for dir in get_sub_dirs(commands_directory):
-            command = u.get_command(dir)
+        for cmd_name in get_sub_dirs(commands_directory):
+            if not u.has_permission(cmd_name, context.message)[0]:
+                continue
+            command = u.get_command(cmd_name)
 
             if command.type == 'hidden':
                 continue

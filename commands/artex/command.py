@@ -10,6 +10,7 @@ class Command(u.Command):
     description = "Latest announcement from https://theartex.net/announcements"
     usage = '{cmd_prefix}artex'
     type = "none"
+    permissions = ['guild:267529399656513538', 'send_messages', 'read_messages']
 
     @staticmethod
     async def execute(context: u.CommandContext):
