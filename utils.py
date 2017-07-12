@@ -2,6 +2,7 @@ import json
 import discord
 import importlib
 from pathlib import Path
+import datetime
 
 
 # Command context class
@@ -88,3 +89,17 @@ def has_permission(cmd, msg):
                 if not getattr(user_perms, req_perm):
                     return [False, req_perm.upper()]
     return [True]
+
+
+def format_ms_time(ms):
+    stamp = int(ms)
+    stamp = stamp / 1000
+    time = datetime.datetime.fromtimestamp(stamp)
+    return time.strftime("%B %d, %Y - %H:%M:%S.%f")
+
+
+def format_ms_time_simple(ms):
+    stamp = int(ms)
+    stamp = stamp / 1000
+    time = datetime.datetime.fromtimestamp(stamp)
+    return time.strftime("%B %d, %Y - %I:%M %p")
