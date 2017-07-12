@@ -1,18 +1,21 @@
 import utils as u
 
-
-async def execute(context: u.CommandContext):
-    msg = context.message
-    client = context.client
-    if msg.author.id != msg.server.owner.id:
+class Command(u.Command):
+    name = "set-prefix"
+    description = "Sets the current guild's command prefix."
+    usage = '{cmd_prefix}set-prefix'
+    type = "none"
+    
+    @staticmethod
+    async def execute(context: u.CommandContext):
+        msg = context.message
+        client = context.client
+        if len(context.args) < 2:
+            await client.send_message(msg.channel, '<@{}>: You must specify a prefix!'.format(msg.author.id))
+            return
+        context.cursor.execute("UPDATE guilds SET prefix='{}' WHERE gid='{}'".format(context.args[1], msg.server.id))
+        context.database.commit()
         await client.send_message(msg.channel,
-                                  '<@{}>: Only the guild owner may run this command!'.format(msg.author.id))
-        return
-    if context.args[1] is None:
-        await client.send_message(msg.channel, '<@{}>: You must specify a prefix!'.format(msg.author.id))
-        return
-    context.cursor.execute("UPDATE guilds SET prefix='{}' WHERE gid='{}'".format(context.args[1], msg.server.id))
-    context.database.commit()
-    await client.send_message(msg.channel,
-                              '<@{}>: The guild `{}` prefix has been set to `{}`'.format(msg.author.id, msg.server.name,
-                                                                                         context.args[1]))
+                                '<@{}>: The guild `{}` prefix has been set to `{}`'.format(msg.author.id, msg.server.name,
+                                                                                            context.args[1]))
+    

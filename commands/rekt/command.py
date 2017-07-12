@@ -4,17 +4,17 @@ import time
 import utils as u
 
 class Command(u.Command):
-    name = "cat"
-    description = "Random cat picture"
-    usage = '{cmd_prefix}cat'
+    name = "rekt"
+    description = "Useful when someone gets _tottaly_ **REKT**"
+    usage = '{cmd_prefix}rekt'
     type = "none"
     
     @staticmethod
     async def execute(context: u.CommandContext):
-        url = await getJSONImage('https://random.cat/meow', 'file')
-        while url.endswith('.mp4'):
-            url = await getJSONImage('https://random.cat/meow', 'file')
-    
+        context.args = context.args[1:]
+        message = ""
+        for str in context.args:
+            message = message + str + " "
         lang = u.lang(context.name, context.message.author)
     
         title = lang['title']
@@ -26,16 +26,8 @@ class Command(u.Command):
         embed.color = discord.Colour.gold()
         embed.title = title
     
-        embed.set_image(url=url)
         embed.set_author(name=context.message.author.name, icon_url=context.message.author.avatar_url)
+        embed.set_image(url=lang['image_url'])
         embed.set_footer(text="\U000023F3 Took {time}ms".format(time=time_took))
     
-        await context.client.send_message(context.message.channel, '', embed=embed)
-
-
-async def getJSONImage(url, name):
-    async with aiohttp.get(url) as r:
-        if r.status == 200:
-            js = await r.json()
-            url = js[name]
-            return url
+        await context.client.send_message(context.message.channel, message, embed=embed)

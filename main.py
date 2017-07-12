@@ -82,71 +82,52 @@ async def on_message(msg):
     # Else, check if the message was sent with the required prefix
     elif msg.content.startswith(prefix):
         msgParts = msg.content.split(' ')
-        msgParts[0] = msgParts[0][1:]
+        msgParts[0] = msgParts[0][len(prefix):]
         if len(msgParts[0]) > 100:
             return
-        elif not msgParts[0].isalnum():
+        elif not msgParts[0].replace('-', '').isalnum():
             return
 
-        commands_directory = "C:/Users/user1/DiscordPyBot/commands/"
-
-        command_config_file = Path("{}{}/cmd.json".format(commands_directory, msgParts[0]))
-
-        if not command_config_file.is_file():
-            return
-
-        command_config_text = command_config_file.read_text()
-        command_config_json = json.loads(command_config_text)
-
-        if command_config_json is None:
-            return
-        elif command_config_json['main'] is None:
-            print("Main was not found in the command config for {}".format(msgParts[0]))
-            return
-
-        command_script = Path("{}{}/{}".format(commands_directory, msgParts[0], command_config_json['main']))
-
-        if not command_script.is_file():
-            print('"{}" was not found for the command "{}"'.format(command_config_json['main'], msgParts[0]))
-            return
-
+        
         # Create command context
         context = u.CommandContext()
         context.client = client
         context.message = msg
-        context.args = msgParts
+        context.args = msgParts[1:]
         context.cursor = cur
         context.database = db
         context.name = msgParts[0]
         context.client_server_data = row
         context.start_time = start_ms_time
-
-        # Delete the users message and start typing
+        
+        command = u.get_command(context.name)
+        
+        if command is None:
+            return
+            
         await client.delete_message(msg)
         await client.send_typing(msg.channel)
+        
+        # Check permissions
+        has_perm = u.has_permission(context.name, context.message)
+        if not has_perm[0]:
+            await client.send_message(msg.channel, '<@{}>: Lacking permission `{}`'.format(msg.author.id, has_perm[1]))
+            return
 
-        # Include and reload command module
-        package = "commands.{}".format(msgParts[0])
-        name = 'command'
-        command_sk = getattr(__import__(package, fromlist=[name]), name)
-        importlib.reload(command_sk)
-
-        # Execute the command module
-        await command_sk.execute(context)
-
+        try:
+            # Execute the command module
+            await command.execute(context)
+        except Exception as e:
+            await client.send_message(msg.channel, '<@{}>: There was an error! `{}`'.format(msg.author.id, e))
+        
         # Log the command
-        print('CMD "{}#{}" ({}) ran "{}" on the guild "{}" ({})'
-              .format(msg.author.name, msg.author.discriminator, msg.author.id, msgParts[0], msg.server.name,
-                      msg.server.id))
-
-        # Unimport the command module, i don't know if this even works.
-        del command_sk
+        print('CMD "{}#{}" ({}) ran "{}" on the guild "{}" ({})'.format(msg.author.name, msg.author.discriminator, msg.author.id, msgParts[0], msg.server.name, msg.server.id))
 
 
 # When Patt joins a server
 @client.event
 async def on_server_join(svr):
-    cur.execute("INSERT INTO guilds VALUES('{}', '!')".format(svr.id))
+    cur.execute("INSERT INTO guilds VALUES('{}', 'p!')".format(svr.id))
     db.commit()
 
 
