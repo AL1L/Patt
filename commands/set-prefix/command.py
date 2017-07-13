@@ -11,12 +11,12 @@ class Command(u.Command):
     async def execute(context: u.CommandContext):
         msg = context.message
         client = context.client
-        if len(context.args) < 2:
+        if len(context.args) < 1:
             await client.send_message(msg.channel, '<@{}>: You must specify a prefix!'.format(msg.author.id))
             return
-        context.cursor.execute("UPDATE guilds SET prefix='{}' WHERE gid='{}'".format(context.args[1], msg.server.id))
+        context.cursor.execute("UPDATE guilds SET prefix='{}' WHERE gid='{}'".format(context.args[0], msg.server.id))
         context.database.commit()
         await client.send_message(msg.channel,
                                   '<@{}>: The guild `{}` prefix has been set to `{}`'.format(msg.author.id,
                                                                                              msg.server.name,
-                                                                                             context.args[1]))
+                                                                                             context.args[0]))
