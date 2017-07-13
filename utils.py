@@ -80,10 +80,10 @@ def has_permission(cmd, msg):
         user_perms = msg.channel.permissions_for(msg.author)
         for req_perm in req_perms:
             if req_perm.startswith('user:'):
-                if msg.author.id not in req_perm.split(':')[1]:
+                if msg.author.id not in req_perm.split(':')[1].split(','):
                     return [False, 'invalid_user'.upper()]
             elif req_perm.startswith('guild:'):
-                if msg.server.id not in req_perm.split(':')[1]:
+                if msg.server.id not in req_perm.split(':')[1].split(','):
                     return [False, 'invalid_guild'.upper()]
             else:
                 if not getattr(user_perms, req_perm):
