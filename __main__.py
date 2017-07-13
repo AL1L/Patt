@@ -8,36 +8,13 @@ import logging
 import sys
 import traceback
 import sqlite3 as lite
-import datetime
+import importlib
+import ai
 
-print('------------------------------')
-print('Parameters: {}'.format(sys.argv))
 
-if sys.argv[1] is None:
-    print('------------------------------')
-    print('Please specify a token for the bot to use.')
-    quit(1)
-
-# DB setup
-db = lite.connect('db.db')
-
-cur = db.cursor()
-cur.execute('SELECT SQLITE_VERSION()')
-
-data = cur.fetchone()
-
-print("SQLite version: {}".format(data[0]))
-print('------------------------------')
-
-# Setup logging
-logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s|%(levelname)s|%(name)s| %(message)s'))
-logger.addHandler(handler)
-
-# Create Discord client
-client = discord.Client()
+if __name__ == "__main__":
+    # Create Discord client
+    client = discord.Client()
 
 
 # When bot is ready
@@ -90,6 +67,10 @@ async def on_message(msg):
         await client.send_typing(msg.channel)
         await client.send_message(msg.channel, u.lang('', msg.author)['guild_prefix'].format(user_id=msg.author.id,
                                                                                              cmd_prefix=prefix))
+        return
+    elif msg.content.startswith('<@{}>'.format(client.user.id)):
+        importlib.reload(ai)
+        await ai.on_message(client, msg)
         return
 
     # Else, check if the message was sent with the required prefix
@@ -243,4 +224,31 @@ async def on_server_remove(svr):
     await client.send_message(log_channel, '', embed=embed)
 
 
-client.run(sys.argv[1])
+if __name__ == "__main__":    
+    print('------------------------------')
+    print('Parameters: {}'.format(sys.argv))
+    
+    if sys.argv[1] is None:
+        print('------------------------------')
+        print('Please specify a token for the bot to use.')
+        quit(1)
+    
+    # DB setup
+    db = lite.connect('db.db')
+    
+    cur = db.cursor()
+    cur.execute('SELECT SQLITE_VERSION()')
+    
+    data = cur.fetchone()
+    
+    print("SQLite version: {}".format(data[0]))
+    print('------------------------------')
+    
+    # Setup logging
+    logger = logging.getLogger('discord')
+    logger.setLevel(logging.DEBUG)
+    handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+    handler.setFormatter(logging.Formatter('%(asctime)s|%(levelname)s|%(name)s| %(message)s'))
+    logger.addHandler(handler)
+    
+    client.run(sys.argv[1])
