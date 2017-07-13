@@ -6,7 +6,7 @@ import utils as u
 
 class Command(u.Command):
     name = "rekt"
-    description = "Useful when someone gets _tottaly_ **REKT**"
+    description = "Useful when someone gets _totally_ **REKT**"
     usage = '{cmd_prefix}rekt'
     type = "none"
 
