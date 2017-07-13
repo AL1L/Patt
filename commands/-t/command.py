@@ -4,9 +4,9 @@ import utils as u
 
 
 class Command(u.Command):
-    name = "test"
+    name = "-t"
     description = "A test command for the bot developer"
-    usage = '{cmd_prefix}test'
+    usage = '{cmd_prefix}-t'
     type = "none"
     permissions = ['user:152953323417239552', 'send_messages', 'read_messages']
 
