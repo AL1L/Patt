@@ -6,11 +6,14 @@ import discord
 import utils as u
 import logging
 import sys
+import os
 import traceback
 import sqlite3 as lite
 import importlib
 import ai
 
+global log_channel
+os.system('cls')
 
 if __name__ == "__main__":
     # Create Discord client
@@ -20,19 +23,22 @@ if __name__ == "__main__":
 # When bot is ready
 @client.event
 async def on_ready():
+    global log_channel
+    log_channel = client.get_server("292433239480467458").get_channel('314442420794294272')
     print('------------------------------')
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
     print('------------------------------')
     await client.change_presence(game=discord.Game(name='Say @Patt for prefix'))
-    log_channel = client.get_server("267529399656513538").get_channel('334544903872839682')
     time_took = int(round(time.time() * 1000)) - sk_start_time
     embed = discord.Embed()
     embed.description = '**Start Time:**\n{start}\n\n' + \
-                        '**Ready At:**\n{end}\n\n'
+                        '**Ready At:**\n{end}\n\n' + \
+                        '**PID:**\n{pid}\n\n'
     embed.description = embed.description.format(start=u.format_ms_time(sk_start_time),
-                                                 end=u.format_ms_time(sk_start_time + time_took))
+                                                 end=u.format_ms_time(sk_start_time + time_took),
+                                                 pid=os.getpid())
     embed.title = 'Bot Started'
     embed.color = discord.Colour.green()
     embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
@@ -125,7 +131,6 @@ async def on_message(msg):
 
         embed = discord.Embed()
         embed.color = discord.Colour.green()
-        log_channel = client.get_server("267529399656513538").get_channel('334544903872839682')
         perms = str(has_perm[0])
         if not has_perm[0]:
             perms = perms + ' ({})'.format(has_perm[1])
@@ -167,7 +172,6 @@ async def on_server_join(svr):
     cur.execute("INSERT INTO guilds VALUES('{}', 'p!')".format(svr.id))
     db.commit()
     time_took = int(round(time.time() * 1000)) - start_time
-    log_channel = client.get_server("267529399656513538").get_channel('334544903872839682')
     embed = discord.Embed()
     embed.description = '**Server:**\n{server}\n\n' + \
                         '**Owner:**\n{owner}\n\n' + \
@@ -199,7 +203,6 @@ async def on_server_remove(svr):
     cur.execute("DELETE FROM guilds WHERE gid='{}'".format(svr.id))
     db.commit()
     time_took = int(round(time.time() * 1000)) - start_time
-    log_channel = client.get_server("267529399656513538").get_channel('334544903872839682')
     embed = discord.Embed()
     embed.description = '**Server:**\n{server}\n\n' + \
                         '**Owner:**\n{owner}\n\n' + \

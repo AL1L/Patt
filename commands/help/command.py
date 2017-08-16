@@ -59,7 +59,7 @@ class Command(u.Command):
 
                 usage = command.usage.format(cmd_prefix=context.client_server_data[1])
 
-                help_list = help_list + "**" + usage + "**\n" + command.description + '\n\n'
+                help_list = help_list + "**" + usage + "**\n" + command.description + '\n'
 
             help_list + help_list[:-2] + '{}'.format(help_list)
             embed.description = help_list
