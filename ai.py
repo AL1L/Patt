@@ -9,7 +9,7 @@ async def on_message(client: discord.Client, msg: discord.Message):
     channel: discord.Channel = msg.channel
     type: discord.MessageType = msg.type
     query = msg.content[len('<@' + client.user.id + '>'):]
-    ai = apiai.ApiAI('abd47900ec2845f0a5b387a0e8c8dd64')
+    ai = apiai.ApiAI('************************')
     request = ai.text_request()
     request.session_id = author.id
     request.query = query
