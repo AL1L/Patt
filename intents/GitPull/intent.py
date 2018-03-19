@@ -14,4 +14,4 @@ class Intent(u.Intent):
     async def handle(context: u.IntentContext):
         if context.message.author.id in allowed_users:
             await context.message.channel.send('Pulling...')
-            context.output = '```' + check_output(["git", "pull"]).decode() + '```'
+            context.output = '```' + check_output(["git", "pull", "https://github.com/artex-development/Patt.git", "wip/ai-dev"]).decode() + '```'
