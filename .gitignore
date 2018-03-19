@@ -1,2 +1,5 @@
 .idea/
 __pycache__/
+db.db
+discord.log
+bot.bat

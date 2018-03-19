@@ -1,6 +1,0 @@
-{
-  "default": {
-    "title": "Lookup for {ip}",
-    "missing_arg_0": "<@{user_id}>: you must specify an IP or domain to lookup"
-  }
-}

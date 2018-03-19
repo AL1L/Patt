@@ -1,5 +1,0 @@
-{
-  "default": {
-    "guild_prefix": "<@{user_id}>: This guilds prefix is `{cmd_prefix}`"
-  }
-}

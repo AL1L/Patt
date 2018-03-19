@@ -1,9 +1,0 @@
-{
-  "default": {
-    "title": "Here is the latest announcement on https://theartex.net/announcements",
-    "timestamp_label": "**Timestamp:**",
-    "timestamp": "{timestamp}",
-    "message_label": "**Message:**",
-    "message": "{message}"
-  }
-}
