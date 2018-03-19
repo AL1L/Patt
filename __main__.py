@@ -67,7 +67,7 @@ async def on_message(msg):
 @client.event
 async def on_server_join(svr):
     start_time = int(round(time.time() * 1000))
-    cur.execute("INSERT INTO guilds VALUES('{}', 'p!')".format(svr.id))
+    cur.execute("INSERT INTO guilds VALUES('{}')".format(svr.id))
     db.commit()
     time_took = int(round(time.time() * 1000)) - start_time
     embed = discord.Embed()
