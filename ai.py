@@ -98,7 +98,7 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
             rtn = '`' + rtn + '`'
         if context.output_embed is not None:
             rtn = rtn + '\n\n**Embed:**\ntrue'
-        embed.description = embed.description.format(uid=author.id, input=query, output=rtn, start=u.format_ms_time(start_time), end=u.format_ms_time(start_time + time_took), response_id=json['id'], intent=json['result']['metadata']['intentName'] + ' (' + json['result']['metadata']['intentId'] + ')')
+        embed.description = embed.description.format(uid=author.id, input=query, output=rtn, start=u.format_ms_time(start_time), end=u.format_ms_time(start_time + time_took), response_id=json['id'], intent=json['result']['metadata']['intentName'] + ' (' + json['result']['metadata']['intentId'] + ')').replace('`', '')
         embed.title = 'Got message'
         au = author.display_name + '#' + author.discriminator
         embed.set_author(name=au, icon_url=author.avatar_url)
