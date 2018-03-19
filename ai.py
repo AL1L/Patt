@@ -11,6 +11,7 @@ log_channel = None
 
 async def on_message(client: discord.Client, msg: discord.Message, start_time):
     global log_channel
+    failed = False
     if log_channel is None:
         log_channel = client.get_server("366785187029188609").get_channel('366785269351055360')
     author: discord.Member = msg.author
@@ -51,8 +52,6 @@ async def on_message(client: discord.Client, msg: discord.Message, start_time):
         context.message = msg
         context.start_time = start_time
     
-    print('TO [{}] < {}'.format(author.id, rtn))
-    
     if context is not None:
         intent = u.get_intent(context.name)
         if intent is not None:
@@ -66,6 +65,7 @@ async def on_message(client: discord.Client, msg: discord.Message, start_time):
                 print(e)
         rtn = context.output
     
+    print('TO [{}] < {}'.format(author.id, rtn))
     if rtn is '' or rtn is None:
         rtn = ' '
     if context is not None:
@@ -98,9 +98,15 @@ async def on_message(client: discord.Client, msg: discord.Message, start_time):
             rtn = rtn + '\n\n**Embed:**\ntrue'
         embed.description = embed.description.format(uid=author.id, input=query, output=rtn, start=u.format_ms_time(start_time), end=u.format_ms_time(start_time + time_took), response_id=json['id'], intent=json['result']['metadata']['intentName'] + ' (' + json['result']['metadata']['intentId'] + ')')
         embed.title = 'Got message'
-        embed.color = discord.Colour.green()
+        content = ''
+        if failed:
+            content = '<@&423581940256604160>'
+            embed.color = discord.Colour.red()
+            embed.description = embed.description + '**Error:**\n```{}```\n\n'.format(error)
+        else:
+            embed.color = discord.Colour.green()
         embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-        await client.send_message(log_channel, '', embed=embed)
+        await client.send_message(log_channel, content, embed=embed)
     
 
 
