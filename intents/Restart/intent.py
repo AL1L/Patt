@@ -12,7 +12,6 @@ class Intent(u.Intent):
     
     @staticmethod
     async def handle(context: u.IntentContext):
-        print(type(context.message.author.id))
         if context.message.author.id in allowed_users:
             await context.client.send_message(context.message.channel, 'I\'m goning to take a quick power-nap and I\'ll be right back!')
             context.client.logout() 
