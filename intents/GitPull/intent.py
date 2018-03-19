@@ -14,4 +14,4 @@ class Intent(u.Intent):
     async def handle(context: u.IntentContext):
         if context.message.author.id in allowed_users:
             await context.client.send_message(context.message.channel, 'Pulling...')
-            context.output = check_output("git pull").decode()
+            context.output = '```' + check_output("git pull").decode() + '```'
