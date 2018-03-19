@@ -13,7 +13,7 @@ class Intent(u.Intent):
 
 async def getJSONText(url, name):
     hd = {'Accept':'application/json'}
-    async with aiohttp.get(url, headers=hd) as r:
+    async with aiohttp.request('GET', url, headers=hd) as r:
         print(r.headers['Content-Type'])
         if r.status == 200:
             js = await r.json()

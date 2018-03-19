@@ -19,7 +19,7 @@ class Intent(u.Intent):
         context.output_embed = embed
 
 async def getJSONImage(url, name):
-    async with aiohttp.get(url) as r:
+    async with aiohttp.request('GET', url) as r:
         if r.status == 200:
             print(r.text())
             return r.url
