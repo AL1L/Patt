@@ -12,7 +12,7 @@ import sqlite3 as lite
 import importlib
 import ai
 import aiohttp
-
+print('Starting...')
 global log_channel
 os.system('cls')
 

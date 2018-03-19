@@ -4,6 +4,7 @@ import json as j
 import utils as u
 import time
 import traceback
+import sys
 
 
 log_channel = None
@@ -18,7 +19,7 @@ async def on_message(client: discord.Client, msg: discord.Message, start_time):
     type: discord.MessageType = msg.type
     query = msg.content.replace('<@{}>'.format(client.user.id), '').replace(',', '').replace('.', '').replace('?', '').replace('!', '').replace('`', '').strip()
     print('FR [{}] > {}'.format(author.id, query))
-    ai = apiai.ApiAI('API_KEY')
+    ai = apiai.ApiAI(sys.argv[1])
     request = ai.text_request()
     request.session_id = author.id
     request.query = query
