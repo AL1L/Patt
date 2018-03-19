@@ -7,7 +7,7 @@ class Intent(u.Intent):
 
     @staticmethod
     async def handle(context: u.IntentContext):
-        url = await getJSONImage('http://thecatapi.com/api/images/get', 'url')
+        url = await getJSONImage('http://aws.random.cat/meow', 'file')
         
         embed = discord.Embed()
         embed.color = discord.Colour.gold()
@@ -21,5 +21,6 @@ class Intent(u.Intent):
 async def getJSONImage(url, name):
     async with aiohttp.request('GET', url) as r:
         if r.status == 200:
-            print(r.text())
-            return r.url
+            js = await r.json()
+            url = js[name]
+            return url
