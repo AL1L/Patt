@@ -6,7 +6,7 @@ import sys
 from subprocess import Popen
 
 
-allowed_users = ['366085504971571200', '202150484058832905']
+allowed_users = [366085504971571200, 202150484058832905]
 
 class Intent(u.Intent):
     
