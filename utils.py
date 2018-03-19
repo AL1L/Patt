@@ -28,9 +28,9 @@ class Intent(object):
 
 
 def get_intent(name):
-    intent_directory = "C:/Users/user1/Patt/intents/{name}/".format(name=name)
-    intent_file = Path("{}/intent.py".format(intent_directory))
-
+    intent_directory = "/root/Patt/intents/{name}/".format(name=name)
+    intent_file = Path("{}/intent.py".format(intent_directory)) 
+    
     if not intent_file.is_file():
         return None
 
