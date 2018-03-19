@@ -10,7 +10,7 @@ import sys
 
 log_channel = None
 
-async def on_message(client: discord.Client, msg: discord.Message, start_time):
+async def on_message(client: discord.Client, cur, msg: discord.Message, start_time):
     global log_channel
     failed = False
     if log_channel is None:
@@ -52,6 +52,7 @@ async def on_message(client: discord.Client, msg: discord.Message, start_time):
         context.client = client
         context.message = msg
         context.start_time = start_time
+        context.cursor = cur
     
     if context is not None:
         intent = u.get_intent(context.name)

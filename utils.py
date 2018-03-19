@@ -17,6 +17,7 @@ class IntentContext(object):
     client = None
     message = None
     start_time = 0
+    cursor = None
 
 
 # Intent context class

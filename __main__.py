@@ -58,7 +58,7 @@ async def on_message(msg):
     if '<@{}>'.format(client.user.id) in msg.content or msg.channel.is_private:
         await client.send_typing(msg.channel)
         importlib.reload(ai)
-        await ai.on_message(client, msg, start_time)
+        await ai.on_message(client, cur, msg, start_time)
         return
     return
 
