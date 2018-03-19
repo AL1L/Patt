@@ -13,7 +13,7 @@ class Intent(u.Intent):
     @staticmethod
     async def handle(context: u.IntentContext):
         if context.message.author.id in allowed_users:
-            await context.client.send_message(context.message.channel, 'I\'m goning to take a quick power-nap and I\'ll be right back!')
+            await context.message.channel.send('I\'m goning to take a quick power-nap and I\'ll be right back!')
             context.client.logout() 
             os.system('cls')
             Popen("bot.bat")

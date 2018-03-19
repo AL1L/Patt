@@ -14,9 +14,9 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
     global log_channel
     failed = False
     if log_channel is None:
-        log_channel = client.get_server("366785187029188609").get_channel('366785269351055360')
+        log_channel = client.get_guild(366785187029188609).get_channel(366785269351055360)
     author: discord.Member = msg.author
-    server: discord.Server = msg.server
+    guild: discord.Guild = msg.guild
     channel: discord.Channel = msg.channel
     type: discord.MessageType = msg.type
     query = msg.content.replace('<@{}>'.format(client.user.id), '').replace(',', '').replace('.', '').replace('?', '').replace('!', '').replace('`', '').strip()
@@ -33,11 +33,11 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
         if 'action' in json['result']:
             action = json['result']['action']
     rtn = rtn.replace('%author_id%', '{author_id}')
-    rtn = rtn.replace('%author_mention%', '<@' + author.id + '>')
+    rtn = rtn.replace('%author_mention%', '<@' + str(author.id) + '>')
     rtn = rtn.replace('%client_name%', client.user.name)
-    if server is not None:
-        rtn = rtn.replace('%guild_name%', server.name)
-        rtn = rtn.replace('%guild_users%', '{}'.format(server.member_count))
+    if guild is not None:
+        rtn = rtn.replace('%guild_name%', guild.name)
+        rtn = rtn.replace('%guild_users%', '{}'.format(guild.member_count))
     if rtn is "" or rtn is None:
         rtn = "Sorry, i didn't understand what you said."
     
@@ -62,7 +62,7 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
                 await intent.handle(context)
             except Exception as e:
                 failed = True
-                await client.send_message(msg.channel, '`There was an error when handling that request`')
+                await msg.channel.send('`There was an error when handling that request`')
                 error = traceback.format_exc()
                 print(e)
         rtn = context.output
@@ -72,11 +72,11 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
         rtn = ' '
     if context is not None:
         if context.output_embed is None:
-            await client.send_message(msg.channel, rtn)
+            await msg.channel.send(rtn)
         else:
-            await client.send_message(msg.channel, rtn, embed=context.output_embed)
+            await msg.channel.send(rtn, embed=context.output_embed)
     else:
-        await client.send_message(msg.channel, rtn)
+        await msg.channel.send(rtn)
    # print(json_raw)
     # Log
     
@@ -89,7 +89,7 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
                             '**Id:**\n{response_id}\n\n' + \
                             '**Intent:**\n`{intent}`\n\n'
         # embed.description = embed.description + \
-        #                     '**Server:**\n{server}\n\n' + \
+        #                     '**Guild:**\n{guild}\n\n' + \
         #                     '**Channel:**\n{channel}\n\n'
         embed.description = embed.description + \
                             '**Start Time:**\n{start}\n\n' + \
@@ -108,7 +108,7 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
         else:
             embed.color = discord.Colour.green()
         embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-        await client.send_message(log_channel, content, embed=embed)
+        await log_channel.send(content, embed=embed)
     
 
 

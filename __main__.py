@@ -25,13 +25,13 @@ if __name__ == "__main__":
 @client.event
 async def on_ready():
     global log_channel
-    log_channel = client.get_server("366785187029188609").get_channel('366785269351055360')
+    log_channel = client.get_guild(366785187029188609).get_channel(366785269351055360)
     print('------------------------------')
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
     print('------------------------------')
-    await client.change_presence(game=discord.Game(name='Talk to me!'))
+    # await client.change_presence(game=discord.Game(name='Talk to me!'))
     time_took = int(round(time.time() * 1000)) - sk_start_time
     embed = discord.Embed()
     embed.description = '**Start Time:**\n{start}\n\n' + \
@@ -43,7 +43,7 @@ async def on_ready():
     embed.title = 'Bot Started'
     embed.color = discord.Colour.green()
     embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-    await client.send_message(log_channel, '', embed=embed)
+    await log_channel.send('', embed=embed)
 
 
 # When a message is sent that can be read by Patt
@@ -55,78 +55,78 @@ async def on_message(msg):
     # Channel cannot be private
     if client.user.id == msg.author.id:
         return
-    if '<@{}>'.format(client.user.id) in msg.content or msg.channel.is_private:
-        await client.send_typing(msg.channel)
-        importlib.reload(ai)
-        await ai.on_message(client, cur, msg, start_time)
+    if '<@{}>'.format(client.user.id) in msg.content or isinstance(msg.channel, discord.abc.PrivateChannel):
+        async with msg.channel.typing():
+            importlib.reload(ai)
+            await ai.on_message(client, cur, msg, start_time)
         return
     return
 
 
-# When Patt joins a server
+# When Patt joins a Guild
 @client.event
-async def on_server_join(svr):
+async def on_guild_join(svr):
     start_time = int(round(time.time() * 1000))
     cur.execute("INSERT INTO guilds VALUES('{}')".format(svr.id))
     db.commit()
     time_took = int(round(time.time() * 1000)) - start_time
     embed = discord.Embed()
-    embed.description = '**Server:**\n{server}\n\n' + \
+    embed.description = '**Guild:**\n{guild}\n\n' + \
                         '**Owner:**\n{owner}\n\n' + \
                         '**Users:**\n{user_amt}\n\n' + \
                         '**Is Large:**\n{is_large}\n\n' + \
                         '**Start Time:**\n{start}\n\n' + \
                         '**End Time:**\n{end}\n\n'
     embed.description = embed.description.format(owner='`{owner_name}#{owner_discriminator}` _({owner_id})_',
-                                                 server='`{server_name}` _({server_id})_',
+                                                 guild='`{guild_name}` _({guild_id})_',
                                                  start=u.format_ms_time(start_time),
                                                  end=u.format_ms_time(start_time + time_took),
                                                  is_large=svr.large,
                                                  user_amt=len(svr.members))
     embed.description = embed.description.format(owner_name=svr.owner.name,
                                                  owner_discriminator=svr.owner.discriminator,
-                                                 owner_id=svr.owner.id, server_name=svr.name,
-                                                 server_id=svr.id)
+                                                 owner_id=svr.owner.id, guild_name=svr.name,
+                                                 guild_id=svr.id)
     embed.set_thumbnail(url=svr.icon_url)
     embed.title = 'Added to Guild'
     embed.color = discord.Colour.green()
     embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-    await client.send_message(log_channel, '', embed=embed)
-    await update_server_count()
+    await log_channel.send('', embed=embed)
+    await update_guild_count()
 
 
-# When Patt leaves a server
+# When Patt leaves a guild
 @client.event
-async def on_server_remove(svr):
+async def on_guild_remove(svr):
     start_time = int(round(time.time() * 1000))
     cur.execute("DELETE FROM guilds WHERE gid='{}'".format(svr.id))
     db.commit()
     time_took = int(round(time.time() * 1000)) - start_time
     embed = discord.Embed()
-    embed.description = '**Server:**\n{server}\n\n' + \
+    embed.description = '**Guild:**\n{guild}\n\n' + \
                         '**Owner:**\n{owner}\n\n' + \
                         '**Users:**\n{user_amt}\n\n' + \
                         '**Is Large:**\n{is_large}\n\n' + \
                         '**Start Time:**\n{start}\n\n' + \
                         '**End Time:**\n{end}\n\n'
     embed.description = embed.description.format(owner='`{owner_name}#{owner_discriminator}` _({owner_id})_',
-                                                 server='`{server_name}` _({server_id})_',
+                                                 guild='`{guild_name}` _({guild_id})_',
                                                  start=u.format_ms_time(start_time),
                                                  end=u.format_ms_time(start_time + time_took),
                                                  is_large=svr.large,
                                                  user_amt=len(svr.members))
     embed.description = embed.description.format(owner_name=svr.owner.name,
                                                  owner_discriminator=svr.owner.discriminator,
-                                                 owner_id=svr.owner.id, server_name=svr.name,
-                                                 server_id=svr.id)
+                                                 owner_id=svr.owner.id, guild_name=svr.name,
+                                                 guild_id=svr.id)
     embed.set_thumbnail(url=svr.icon_url)
     embed.title = 'Removed from Guild'
     embed.color = discord.Colour.red()
     embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-    await client.send_message(log_channel, '', embed=embed)
-    await update_server_count()
+    await log_channel.send('', embed=embed)
+    await update_guild_count()
     
-async def update_server_count():
+async def update_guild_count():
     cur.execute("SELECT * FROM guilds")
     rows = cur.fetchall()
     amt = len(rows)

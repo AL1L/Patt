@@ -53,7 +53,7 @@ def get_intent(name):
 #                 if msg.author.id not in req_perm.split(':')[1].split(','):
 #                     return [False, 'INVALID_USER']
 #             elif req_perm.startswith('guild:'):
-#                 if msg.server.id not in req_perm.split(':')[1].split(','):
+#                 if msg.guild.id not in req_perm.split(':')[1].split(','):
 #                     return [False, 'INVALID_GUILD']
 #             elif req_perm.startswith('channel:'):
 #                 if msg.channel.id not in req_perm.split(':')[1].split(','):
