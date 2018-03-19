@@ -16,6 +16,6 @@ class Intent(u.Intent):
             await context.message.channel.send('I\'m goning to take a quick power-nap and I\'ll be right back!')
             context.client.logout() 
             os.system('cls')
-            Popen("bot.bat")
+            Popen("start.sh")
             sys.exit()
             return

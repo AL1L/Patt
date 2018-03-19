@@ -5,3 +5,4 @@ discord.log
 bot.bat
 db.db
 *.db
+start.sh
