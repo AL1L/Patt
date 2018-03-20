@@ -53,7 +53,7 @@ async def on_message(msg):
     start_time = int(round(time.time() * 1000))
 
     # Channel cannot be private
-    if client.user.id == msg.author.id or msg.content.startswith('#'):
+    if client.user.id == msg.author.id or msg.content.startswith('#') or msg.author.bot:
         return
     if '<@{}>'.format(client.user.id) in msg.content or isinstance(msg.channel, discord.abc.PrivateChannel) or msg.channel.name == 'patt':
         async with msg.channel.typing():
