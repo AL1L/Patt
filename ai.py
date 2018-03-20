@@ -5,6 +5,9 @@ import utils as u
 import time
 import traceback
 import sys
+import json as jsonlib
+import random
+
 
 # Test comment
 
@@ -53,18 +56,20 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
         context.message = msg
         context.start_time = start_time
         context.cursor = cur
+        context.request = json
     
     if context is not None:
-        intent = u.get_intent(context.name)
-        if intent is not None:
-            try:
-                # Execute the intent module
-                await intent.handle(context)
-            except Exception as e:
-                failed = True
-                await msg.channel.send('`There was an error when handling that request`')
-                error = traceback.format_exc()
-                print(e)
+        if await handle_payload(json, context):
+            intent = u.get_intent(context.name)
+            if intent is not None:
+                try:
+                    # Execute the intent module
+                    await intent.handle(context)
+                except Exception as e:
+                    failed = True
+                    await msg.channel.send('`There was an error when handling that request`')
+                    error = traceback.format_exc()
+                    print(e)
         rtn = context.output
     
     print('TO [{}] < {}'.format(author.id, rtn))
@@ -112,7 +117,28 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
         embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
         await log_channel.send(content, embed=embed)
     
-
+async def handle_payload(json, context):
+    # print(jsonlib.dumps(json))
+    # Make sure there is a payload
+    if 'result' not in json: 
+        return
+    if 'fulfillment' not in json['result']: 
+        return
+    if 'messages' not in json['result']['fulfillment']: 
+        return
+    payload = None
+    for msg in json['result']['fulfillment']['messages']:
+        if msg['type'] != 4:
+            continue
+        payload = msg['payload']
+    if payload is None:
+        return True
+        
+    # Do stuff
+    if 'nsfw' in payload and not context.message.channel.is_nsfw():
+        context.output = random.choice(payload['nsfw'])
+        return False
+    return True
 
 async def getJSONImage(url, name):
     async with aiohttp.get(url) as r:

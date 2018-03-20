@@ -18,6 +18,7 @@ class IntentContext(object):
     message = None
     start_time = 0
     cursor = None
+    request = None
 
 
 # Intent context class
@@ -28,7 +29,7 @@ class Intent(object):
 
 
 def get_intent(name):
-    intent_directory = "/root/Patt/intents/{name}/".format(name=name)
+    intent_directory = "intents/{name}/".format(name=name)
     intent_file = Path("{}/intent.py".format(intent_directory)) 
     
     if not intent_file.is_file():
