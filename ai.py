@@ -22,7 +22,7 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
     guild: discord.Guild = msg.guild
     channel: discord.Channel = msg.channel
     type: discord.MessageType = msg.type
-    query = msg.content.replace('<@{}>'.format(client.user.id), '').replace(',', '').replace('.', '').replace('?', '').replace('!', '').replace('`', '').strip()
+    query = msg.content.replace('<@{}>'.format(client.user.id), '').replace('<@!{}>'.format(client.user.id), '').replace(',', '').replace('.', '').replace('?', '').replace('!', '').replace('`', '').strip()
     print('FR [{}] > {}'.format(author.id, query))
     ai = apiai.ApiAI(sys.argv[2])
     request = ai.text_request()

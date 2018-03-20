@@ -55,7 +55,7 @@ async def on_message(msg):
     # Channel cannot be private
     if client.user.id == msg.author.id or msg.content.startswith('#') or msg.author.bot:
         return
-    if '<@{}>'.format(client.user.id) in msg.content or isinstance(msg.channel, discord.abc.PrivateChannel) or msg.channel.name == 'patt':
+    if '<@{}>'.format(client.user.id) in msg.content or '<@!{}>'.format(client.user.id) in msg.content or isinstance(msg.channel, discord.abc.PrivateChannel) or msg.channel.name == 'patt':
         await msg.channel.trigger_typing()
         importlib.reload(ai)
         await ai.on_message(client, cur, msg, start_time)
