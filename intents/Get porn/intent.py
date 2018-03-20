@@ -44,7 +44,7 @@ def getTitle(type):
         ],
         "self-shot": [
             "Isn't she cute?",
-            "Oh i love her?",
+            "Oh i love her",
             "I'd smash"
         ],
         "big-tits": [
@@ -65,7 +65,11 @@ async def getImage(type):
     async with aiohttp.request('GET', url) as r:
         if r.status == 200:
             text = await r.text()
-            p = re.compile("<img srcset='(https://(www|content|img)\.pornpics\.com/[0-9-]{10}/[0-9]+_[0-9]+\.(jpg|png|gif)) 300w")
-            
-            
-            return p.search(text).group(1)
+            p = re.compile("<img srcset='(https://(www|content|img)\.pornpics\.com/([0-9-]{10}/[0-9]+_[0-9]+)\.(jpg|png|gif)) 300w")
+            f = list(p.finditer(text))
+            s = random.choice(f)
+            url = 'https://cdn.pornpics.com/pics/'+s.group(3) + 'big.'+s.group(4)
+            async with aiohttp.request('GET', url) as r:
+                if r.status == 200:
+                    return url
+            return s.group(1)
