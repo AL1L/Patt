@@ -56,9 +56,9 @@ async def on_message(msg):
     if client.user.id == msg.author.id or msg.content.startswith('#') or msg.author.bot:
         return
     if '<@{}>'.format(client.user.id) in msg.content or isinstance(msg.channel, discord.abc.PrivateChannel) or msg.channel.name == 'patt':
-        async with msg.channel.typing():
-            importlib.reload(ai)
-            await ai.on_message(client, cur, msg, start_time)
+        await msg.channel.trigger_typing()
+        importlib.reload(ai)
+        await ai.on_message(client, cur, msg, start_time)
         return
     return
 
