@@ -11,6 +11,10 @@ class Intent(u.Intent):
         
         porn_type = context.request['result']['parameters']['nsfw_type']
         
+        if porn_type == '':
+            context.output = 'I don\'t know what those are, try asking for something else'
+            return
+        
         url = await getImage(porn_type)
         
         embed = discord.Embed()
