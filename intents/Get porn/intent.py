@@ -25,7 +25,7 @@ class Intent(u.Intent):
         context.output_embed = embed
 
 def getTitle(type):
-    return random.choice({
+    arr = {
         'tiny-tits': [
             "I guess i can show you this one, don't judge my size",
             "They're a little small, but what do you think?"
@@ -56,7 +56,16 @@ def getTitle(type):
             "Oh i love her",
             "I'd smash"
         ]
-    }[type])
+    }
+    if type in arr:
+        return random.choice(arr[type])
+    else:
+        return random.choice([
+            "Mmm, this one looks good",
+            "I guess i can show you this one",
+            "I like this one",
+            "I've seen better, but I'm not complaining."
+        ])
 
 async def getImage(type):
     num = str(random.randint(1, 40))
