@@ -53,7 +53,7 @@ def getTitle(type):
         ],
         "babe": [
             "Isn't she cute?",
-            "Oh i love her?",
+            "Oh i love her",
             "I'd smash"
         ]
     }[type])

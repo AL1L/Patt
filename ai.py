@@ -109,7 +109,7 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
         embed.set_author(name=au, icon_url=author.avatar_url)
         content = ''
         if failed:
-            content = '<@&423581940256604160>'
+            content = '<@&425476747165827083>'
             embed.color = discord.Colour.red()
             embed.description = embed.description + '**Error:**\n```{}```\n\n'.format(error)
         else:
