@@ -9,20 +9,21 @@ import json as jsonlib
 import random
 
 
-# Test comment
-
-log_channel = None
-
-async def on_message(client: discord.Client, cur, msg: discord.Message, start_time):
-    global log_channel
+async def on_message(patt, msg: discord.Message, start_time):
     failed = False
-    if log_channel is None:
-        log_channel = client.get_guild(366785187029188609).get_channel(366785269351055360)
     author: discord.Member = msg.author
     guild: discord.Guild = msg.guild
     channel: discord.Channel = msg.channel
     type: discord.MessageType = msg.type
-    query = msg.content.replace('<@{}>'.format(client.user.id), '').replace('<@!{}>'.format(client.user.id), '').replace(',', '').replace('.', '').replace('?', '').replace('!', '').replace('`', '').strip()
+    query = msg.content \
+        .replace('<@{}>'.format(patt.client.user.id), '') \
+        .replace('<@!{}>'.format(patt.client.user.id), '') \
+        .replace(',', '') \
+        .replace('.', '') \
+        .replace('?', '') \
+        .replace('!', '') \
+        .replace('`', '') \
+        .strip()
     print('FR [{}] > {}'.format(author.id, query))
     ai = apiai.ApiAI(sys.argv[2])
     request = ai.text_request()
@@ -37,7 +38,7 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
             action = json['result']['action']
     rtn = rtn.replace('%author_id%', '{author_id}')
     rtn = rtn.replace('%author_mention%', '<@' + str(author.id) + '>')
-    rtn = rtn.replace('%client_name%', client.user.name)
+    rtn = rtn.replace('%client_name%', patt.client.user.name)
     if guild is not None:
         rtn = rtn.replace('%guild_name%', guild.name)
         rtn = rtn.replace('%guild_users%', '{}'.format(guild.member_count))
@@ -52,11 +53,11 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
         context.input = query
         context.raw_input = msg.content
         context.output = rtn
-        context.client = client
+        context.patt = patt
         context.message = msg
         context.start_time = start_time
-        context.cursor = cur
         context.request = json
+        context.user = u.get_user(patt, msg.author.id)
     
     if context is not None:
         if await handle_payload(json, context):
@@ -115,7 +116,7 @@ async def on_message(client: discord.Client, cur, msg: discord.Message, start_ti
         else:
             embed.color = discord.Colour.green()
         embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-        await log_channel.send(content, embed=embed)
+        await patt.log_channel.send(content, embed=embed)
     
 async def handle_payload(json, context):
     # print(jsonlib.dumps(json))

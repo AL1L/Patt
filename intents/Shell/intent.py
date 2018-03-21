@@ -16,7 +16,7 @@ class Intent(u.Intent):
             try:
                 # await context.message.channel.send('Pulling...')
                 # context.output = '```' + check_output(["git", "pull", "https://github.com/artex-development/Patt.git", "wip/ai-dev"]).decode() + '```'
-                client = context.client
+                client = context.patt.client
                 cmd = context.raw_input.replace('<@{}>'.format(client.user.id), '').replace('<@!{}>'.format(client.user.id), '').strip()[1:].strip().split(' ')
                 print(cmd)
                 context.output = '```' + subprocess.run(cmd, stdout=subprocess.PIPE).stdout.decode() + '```'

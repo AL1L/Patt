@@ -12,20 +12,19 @@ import sqlite3 as lite
 import importlib
 import ai
 import aiohttp
-print('Starting...')
-global log_channel
-os.system('cls')
 
-if __name__ == "__main__":
-    # Create Discord client
-    client = discord.Client()
+print('Loading assets...')
+
+global patt
+patt = None
+
+client = discord.Client()
 
 
 # When bot is ready
 @client.event
 async def on_ready():
-    global log_channel
-    log_channel = client.get_guild(366785187029188609).get_channel(366785269351055360)
+    patt.log_channel = client.get_guild(366785187029188609).get_channel(366785269351055360)
     print('------------------------------')
     print('Logged in as')
     print(client.user.name)
@@ -43,7 +42,7 @@ async def on_ready():
     embed.title = 'Bot Started'
     embed.color = discord.Colour.green()
     embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-    await log_channel.send('', embed=embed)
+    await patt.log_channel.send('', embed=embed)
 
 
 # When a message is sent that can be read by Patt
@@ -58,7 +57,7 @@ async def on_message(msg):
     if '<@{}>'.format(client.user.id) in msg.content or '<@!{}>'.format(client.user.id) in msg.content or isinstance(msg.channel, discord.abc.PrivateChannel) or msg.channel.name == 'patt':
         await msg.channel.trigger_typing()
         importlib.reload(ai)
-        await ai.on_message(client, cur, msg, start_time)
+        await ai.on_message(patt, msg, start_time)
         return
     return
 
@@ -144,7 +143,11 @@ if __name__ == "__main__":
     
     if sys.argv[1] is None:
         print('------------------------------')
-        print('Please specify a token for the bot to use.')
+        print('Please specify a Discord token for the bot to use.')
+        quit(1)
+    if sys.argv[2] is None:
+        print('------------------------------')
+        print('Please specify an API.AI token for the bot to use.')
         quit(1)
     
     # DB setup
@@ -165,4 +168,15 @@ if __name__ == "__main__":
     handler.setFormatter(logging.Formatter('%(asctime)s|%(levelname)s|%(name)s| %(message)s'))
     logger.addHandler(handler)
     
-    client.run(sys.argv[1])
+    patt = u.Patt(
+        discord_token=sys.argv[1],
+        apiai_token=sys.argv[2],
+        client=client,
+        database=db,
+        cursor=cur,
+        start_time=sk_start_time
+    )
+    
+    print('Starting Patt...')
+    
+    patt.run()

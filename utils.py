@@ -4,7 +4,27 @@ import importlib
 from pathlib import Path
 import datetime
 
-
+class Patt(object):
+    client = None
+    database = None
+    cursor = None
+    start_time = 0
+    log_channel = None
+    apiai_token = None
+    discord_token = None
+    
+    def __init__(self, discord_token=None, apiai_token=None, client=None, database=None, cursor=None, start_time=None, log_channel=None):
+        self.client = client
+        self.database = database
+        self.cursor = cursor
+        self.start_time = start_time
+        self.log_channel = log_channel
+        self.apiai_token = apiai_token
+        self.discord_token = discord_token
+    
+    def run(self):
+        self.client.run(self.discord_token)
+        
 # Intent context class
 class IntentContext(object):
     name = ""
@@ -14,12 +34,36 @@ class IntentContext(object):
     apiai = None
     output = ""
     output_embed = None
-    client = None
     message = None
     start_time = 0
-    cursor = None
     request = None
-
+    user = None
+    patt = None
+    
+class User(object):
+    discard_user = None
+    id = 0
+    age = None
+    nsfw_enabled = False
+    language = 'en'
+    nickname = None
+    
+def get_user(patt, id):
+    user = User()
+    user.discard_user = patt.client.get_user(id)
+    user.id = int(id)
+    patt.cursor.execute("SELECT * FROM users WHERE id='{}'".format(user.id))
+    data = patt.cursor.fetchone()
+    if data is not None:
+        if data[1] is not None:
+            user.age = int(data[1])
+            user.nsfw_enabled = user.age >= 18
+        user.language = data[2]
+        user.nickname = data[3]
+    else:
+        patt.cursor.execute("INSERT INTO users VALUES('{}', NULL, 'en', NULL)".format(user.id))
+        patt.database.commit()
+        
 
 # Intent context class
 class Intent(object):
