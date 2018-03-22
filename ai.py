@@ -25,7 +25,7 @@ async def on_message(patt, msg: discord.Message, start_time):
         .replace('`', '') \
         .strip()
     print('FR [{}] > {}'.format(author.id, query))
-    ai = apiai.ApiAI(sys.argv[2])
+    ai = apiai.ApiAI(patt.apiai_token)
     request = ai.text_request()
     request.session_id = author.id
     request.query = query
@@ -86,7 +86,7 @@ async def on_message(patt, msg: discord.Message, start_time):
    # print(json_raw)
     # Log
     
-    if context is not None:
+    if context is not None and patt.log_channel is not None:
         time_took = int(round(time.time() * 1000)) - start_time
         embed = discord.Embed()
         embed.description = '**User:**\n<@{uid}> ({uid})\n\n' + \

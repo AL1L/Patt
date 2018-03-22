@@ -12,6 +12,7 @@ import sqlite3 as lite
 import importlib
 import ai
 import aiohttp
+import json
 
 print('Loading assets...')
 
@@ -24,25 +25,28 @@ client = discord.Client()
 # When bot is ready
 @client.event
 async def on_ready():
-    patt.log_channel = client.get_guild(366785187029188609).get_channel(366785269351055360)
+    if config['logging'] is not False:
+        if 'server' in config['logging'] and 'channel' in config['logging']:
+            patt.log_channel = client.get_guild(config['logging']['server']).get_channel(config['logging']['channel'])
     print('------------------------------')
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
     print('------------------------------')
     # await client.change_presence(game=discord.Game(name='Talk to me!'))
-    time_took = int(round(time.time() * 1000)) - sk_start_time
-    embed = discord.Embed()
-    embed.description = '**Start Time:**\n{start}\n\n' + \
-                        '**Ready At:**\n{end}\n\n' + \
-                        '**PID:**\n{pid}\n\n'
-    embed.description = embed.description.format(start=u.format_ms_time(sk_start_time),
-                                                 end=u.format_ms_time(sk_start_time + time_took),
-                                                 pid=os.getpid())
-    embed.title = 'Bot Started'
-    embed.color = discord.Colour.green()
-    embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-    await patt.log_channel.send('', embed=embed)
+    if patt.log_channel is not None:
+        time_took = int(round(time.time() * 1000)) - sk_start_time
+        embed = discord.Embed()
+        embed.description = '**Start Time:**\n{start}\n\n' + \
+                            '**Ready At:**\n{end}\n\n' + \
+                            '**PID:**\n{pid}\n\n'
+        embed.description = embed.description.format(start=u.format_ms_time(sk_start_time),
+                                                     end=u.format_ms_time(sk_start_time + time_took),
+                                                     pid=os.getpid())
+        embed.title = 'Bot Started'
+        embed.color = discord.Colour.green()
+        embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
+        await patt.log_channel.send('', embed=embed)
 
 
 # When a message is sent that can be read by Patt
@@ -68,29 +72,30 @@ async def on_guild_join(svr):
     start_time = int(round(time.time() * 1000))
     cur.execute("INSERT INTO guilds VALUES('{}')".format(svr.id))
     db.commit()
-    time_took = int(round(time.time() * 1000)) - start_time
-    embed = discord.Embed()
-    embed.description = '**Guild:**\n{guild}\n\n' + \
-                        '**Owner:**\n{owner}\n\n' + \
-                        '**Users:**\n{user_amt}\n\n' + \
-                        '**Is Large:**\n{is_large}\n\n' + \
-                        '**Start Time:**\n{start}\n\n' + \
-                        '**End Time:**\n{end}\n\n'
-    embed.description = embed.description.format(owner='`{owner_name}#{owner_discriminator}` _({owner_id})_',
-                                                 guild='`{guild_name}` _({guild_id})_',
-                                                 start=u.format_ms_time(start_time),
-                                                 end=u.format_ms_time(start_time + time_took),
-                                                 is_large=svr.large,
-                                                 user_amt=len(svr.members))
-    embed.description = embed.description.format(owner_name=svr.owner.name,
-                                                 owner_discriminator=svr.owner.discriminator,
-                                                 owner_id=svr.owner.id, guild_name=svr.name,
-                                                 guild_id=svr.id)
-    embed.set_thumbnail(url=svr.icon_url)
-    embed.title = 'Added to Guild'
-    embed.color = discord.Colour.green()
-    embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-    await log_channel.send('', embed=embed)
+    if patt.log_channel is not None:
+        time_took = int(round(time.time() * 1000)) - start_time
+        embed = discord.Embed()
+        embed.description = '**Guild:**\n{guild}\n\n' + \
+                            '**Owner:**\n{owner}\n\n' + \
+                            '**Users:**\n{user_amt}\n\n' + \
+                            '**Is Large:**\n{is_large}\n\n' + \
+                            '**Start Time:**\n{start}\n\n' + \
+                            '**End Time:**\n{end}\n\n'
+        embed.description = embed.description.format(owner='`{owner_name}#{owner_discriminator}` _({owner_id})_',
+                                                     guild='`{guild_name}` _({guild_id})_',
+                                                     start=u.format_ms_time(start_time),
+                                                     end=u.format_ms_time(start_time + time_took),
+                                                     is_large=svr.large,
+                                                     user_amt=len(svr.members))
+        embed.description = embed.description.format(owner_name=svr.owner.name,
+                                                     owner_discriminator=svr.owner.discriminator,
+                                                     owner_id=svr.owner.id, guild_name=svr.name,
+                                                     guild_id=svr.id)
+        embed.set_thumbnail(url=svr.icon_url)
+        embed.title = 'Added to Guild'
+        embed.color = discord.Colour.green()
+        embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
+        await log_channel.send('', embed=embed)
     await update_guild_count()
 
 
@@ -100,38 +105,41 @@ async def on_guild_remove(svr):
     start_time = int(round(time.time() * 1000))
     cur.execute("DELETE FROM guilds WHERE gid='{}'".format(svr.id))
     db.commit()
-    time_took = int(round(time.time() * 1000)) - start_time
-    embed = discord.Embed()
-    embed.description = '**Guild:**\n{guild}\n\n' + \
-                        '**Owner:**\n{owner}\n\n' + \
-                        '**Users:**\n{user_amt}\n\n' + \
-                        '**Is Large:**\n{is_large}\n\n' + \
-                        '**Start Time:**\n{start}\n\n' + \
-                        '**End Time:**\n{end}\n\n'
-    embed.description = embed.description.format(owner='`{owner_name}#{owner_discriminator}` _({owner_id})_',
-                                                 guild='`{guild_name}` _({guild_id})_',
-                                                 start=u.format_ms_time(start_time),
-                                                 end=u.format_ms_time(start_time + time_took),
-                                                 is_large=svr.large,
-                                                 user_amt=len(svr.members))
-    embed.description = embed.description.format(owner_name=svr.owner.name,
-                                                 owner_discriminator=svr.owner.discriminator,
-                                                 owner_id=svr.owner.id, guild_name=svr.name,
-                                                 guild_id=svr.id)
-    embed.set_thumbnail(url=svr.icon_url)
-    embed.title = 'Removed from Guild'
-    embed.color = discord.Colour.red()
-    embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-    await log_channel.send('', embed=embed)
+    if patt.log_channel is not None:
+        time_took = int(round(time.time() * 1000)) - start_time
+        embed = discord.Embed()
+        embed.description = '**Guild:**\n{guild}\n\n' + \
+                            '**Owner:**\n{owner}\n\n' + \
+                            '**Users:**\n{user_amt}\n\n' + \
+                            '**Is Large:**\n{is_large}\n\n' + \
+                            '**Start Time:**\n{start}\n\n' + \
+                            '**End Time:**\n{end}\n\n'
+        embed.description = embed.description.format(owner='`{owner_name}#{owner_discriminator}` _({owner_id})_',
+                                                     guild='`{guild_name}` _({guild_id})_',
+                                                     start=u.format_ms_time(start_time),
+                                                     end=u.format_ms_time(start_time + time_took),
+                                                     is_large=svr.large,
+                                                     user_amt=len(svr.members))
+        embed.description = embed.description.format(owner_name=svr.owner.name,
+                                                     owner_discriminator=svr.owner.discriminator,
+                                                     owner_id=svr.owner.id, guild_name=svr.name,
+                                                     guild_id=svr.id)
+        embed.set_thumbnail(url=svr.icon_url)
+        embed.title = 'Removed from Guild'
+        embed.color = discord.Colour.red()
+        embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
+        await log_channel.send('', embed=embed)
     await update_guild_count()
     
 async def update_guild_count():
+    if patt.dbl_token is None:
+        return
     cur.execute("SELECT * FROM guilds")
     rows = cur.fetchall()
     amt = len(rows)
     pl = {'server_count': amt}
-    hd = {'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM5NTMzNjIxODMxODk5NTQ1NyIsImJvdCI6dHJ1ZSwiaWF0IjoxNTIxMzQyMDc0fQ.e7l7wjucJPpkIvUA4Gyzt2KKJ5NGirnuRg6VT229Ngw'}
-    r = await aiohttp.request('POST', 'https://discordbots.org/api/bots/395336218318995457/stats', headers=hd, data=pl)
+    hd = {'Authorization': patt.dbl_token}
+    r = await aiohttp.request('POST', 'https://discordbots.org/api/bots/{}/stats'.format(client.user.id), headers=hd, data=pl)
     # print(r)
     return r
     
@@ -140,21 +148,45 @@ async def update_guild_count():
 if __name__ == "__main__":    
     print('------------------------------')
     print('Parameters: {}'.format(sys.argv))
-    
-    if sys.argv[1] is None:
+    config = None
+    try:
+        config = json.load(open('config.json'))
+    except Exception:
         print('------------------------------')
-        print('Please specify a Discord token for the bot to use.')
-        quit(1)
-    if sys.argv[2] is None:
-        print('------------------------------')
-        print('Please specify an API.AI token for the bot to use.')
+        print('Missing or invalid config file.')
         quit(1)
     
+    if 'discord_token' not in config or \
+       'apiai_token' not in config or \
+       'logging' not in config or \
+       'admins' not in config or \
+       'database' not in config:
+        print('------------------------------')
+        print('Invalid config file.')
+        quit(1)
+    
+    if 'type' not in config['database'] or \
+       'database' not in config['database'] or \
+       'username' not in config['database'] or \
+       'password' not in config['database'] or \
+       'port' not in config['database'] or \
+       'host' not in config['database']:
+        print('------------------------------')
+        print('Invalid databse in config file.')
+        quit(1)
+    
+    cur = None
     # DB setup
-    db = lite.connect('db.db')
+    if config['database']['type'] == 'SQLite':
+        db = lite.connect(config['database']['database'])
+        cur = db.cursor()
+        cur.execute('SELECT SQLITE_VERSION()')
+    else:
+        print('------------------------------')
+        print('Invalid databse type in config file.')
+        quit(1)
+        
     
-    cur = db.cursor()
-    cur.execute('SELECT SQLITE_VERSION()')
     
     data = cur.fetchone()
     
@@ -169,13 +201,16 @@ if __name__ == "__main__":
     logger.addHandler(handler)
     
     patt = u.Patt(
-        discord_token=sys.argv[1],
-        apiai_token=sys.argv[2],
+        discord_token=config['discord_token'],
+        apiai_token=config['apiai_token'],
         client=client,
         database=db,
         cursor=cur,
-        start_time=sk_start_time
+        start_time=sk_start_time,
+        config=config
     )
+    if 'dbl_token' in config:
+        patt.dbl_token=config['dbl_token']
     
     print('Starting Patt...')
     

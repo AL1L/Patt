@@ -1,0 +1,13 @@
+{
+    "discord_token": "",
+    "apiai_token": "",
+    "admins": [],
+    "database": {
+        "type": "SQLite",
+        "database": "databse.db",
+        "username": "",
+        "password": "",
+        "port": "",
+        "host": ""
+    }
+}

@@ -12,8 +12,11 @@ class Patt(object):
     log_channel = None
     apiai_token = None
     discord_token = None
+    dbl_token = None,
+    config = {}
     
-    def __init__(self, discord_token=None, apiai_token=None, client=None, database=None, cursor=None, start_time=None, log_channel=None):
+    
+    def __init__(self, discord_token=None, apiai_token=None, client=None, database=None, cursor=None, start_time=0, log_channel=None, dbl_token=None, config={}):
         self.client = client
         self.database = database
         self.cursor = cursor
@@ -21,6 +24,8 @@ class Patt(object):
         self.log_channel = log_channel
         self.apiai_token = apiai_token
         self.discord_token = discord_token
+        self.dbl_token = dbl_token
+        self.config = config
     
     def run(self):
         self.client.run(self.discord_token)

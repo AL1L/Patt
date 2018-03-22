@@ -6,3 +6,4 @@ bot.bat
 db.db
 *.db
 start.sh
+config.json
