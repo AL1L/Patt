@@ -128,7 +128,7 @@ async def on_guild_remove(svr):
         embed.title = 'Removed from Guild'
         embed.color = discord.Colour.red()
         embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-        await log_channel.send('', embed=embed)
+        await patt.log_channel.send('', embed=embed)
     await update_guild_count()
     
 async def update_guild_count():
