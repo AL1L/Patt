@@ -134,9 +134,7 @@ async def on_guild_remove(svr):
 async def update_guild_count():
     if patt.dbl_token is None:
         return
-    cur.execute("SELECT * FROM guilds")
-    rows = cur.fetchall()
-    amt = len(rows)
+    amt = len(patt.client.guilds)
     pl = {'server_count': amt}
     hd = {'Authorization': patt.dbl_token}
     r = await aiohttp.request('POST', 'https://discordbots.org/api/bots/{}/stats'.format(client.user.id), headers=hd, data=pl)
