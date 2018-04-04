@@ -54,8 +54,18 @@ class User(object):
     nsfw_enabled = False
     language = 'en'
     nickname = None
+
+def log(patt: Patt, f: dict, inline=True):
+    embed: discord.embed = discord.embed()
+    for k,v in f:
+        if v is not None:
+            embed.add_field(name=str(k), value=str(v), inline=inline)
+    return embed
     
-def get_user(patt, id):
+    
+    
+    
+def get_user(patt: Patt, id: int):
     user = User()
     user.discard_user = patt.client.get_user(id)
     user.id = int(id)
@@ -79,7 +89,7 @@ class Intent(object):
         return
 
 
-def get_intent(name):
+def get_intent(name: str):
     intent_directory = "intents/{name}/".format(name=name)
     intent_file = Path("{}/intent.py".format(intent_directory)) 
     
@@ -93,37 +103,14 @@ def get_intent(name):
     return intent_sk.Intent()
 
 
-
-# def has_permission(cmd, msg):
-#     command = get_command(cmd)
-# 
-#     if command.permissions is not None:
-#         req_perms = command.permissions
-#         user_perms = msg.channel.permissions_for(msg.author)
-#         for req_perm in req_perms:
-#             if req_perm.startswith('user:'):
-#                 if msg.author.id not in req_perm.split(':')[1].split(','):
-#                     return [False, 'INVALID_USER']
-#             elif req_perm.startswith('guild:'):
-#                 if msg.guild.id not in req_perm.split(':')[1].split(','):
-#                     return [False, 'INVALID_GUILD']
-#             elif req_perm.startswith('channel:'):
-#                 if msg.channel.id not in req_perm.split(':')[1].split(','):
-#                     return [False, 'INVALID_CHANNEL']
-#             else:
-#                 if not getattr(user_perms, req_perm):
-#                     return [False, req_perm.upper()]
-#     return [True]
-
-
-def format_ms_time(ms):
+def format_ms_time(ms: int):
     stamp = int(ms)
     stamp = stamp / 1000
     time = datetime.datetime.fromtimestamp(stamp)
     return time.strftime("%B %d, %Y - %H:%M:%S.%f (UTC)")
 
 
-def format_ms_time_simple(ms):
+def format_ms_time_simple(ms:int):
     stamp = int(ms)
     stamp = stamp / 1000
     time = datetime.datetime.fromtimestamp(stamp)

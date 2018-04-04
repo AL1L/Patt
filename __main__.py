@@ -35,13 +35,11 @@ async def on_ready():
     # await client.change_presence(game=discord.Game(name='Talk to me!'))
     if patt.log_channel is not None:
         time_took = int(round(time.time() * 1000)) - sk_start_time
-        embed = discord.Embed()
-        embed.description = '**Start Time:**\n{start}\n\n' + \
-                            '**Ready At:**\n{end}\n\n' + \
-                            '**PID:**\n{pid}\n\n'
-        embed.description = embed.description.format(start=u.format_ms_time(sk_start_time),
-                                                     end=u.format_ms_time(sk_start_time + time_took),
-                                                     pid=os.getpid())
+        embed = u.log(patt, {
+            'Start Time': u.format_ms_time(sk_start_time),
+            'Ready At': u.format_ms_time(sk_start_time + time_took),
+            'pid': os.getpid()
+        })
         embed.title = 'Bot Started'
         embed.color = discord.Colour.green()
         embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
