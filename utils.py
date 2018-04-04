@@ -56,8 +56,8 @@ class User(object):
     nickname = None
 
 def log(patt: Patt, f: dict, inline=True):
-    embed: discord.embed = discord.embed()
-    for k,v in f:
+    embed: discord.Embed = discord.Embed()
+    for k,v in f.items():
         if v is not None:
             embed.add_field(name=str(k), value=str(v), inline=inline)
     return embed

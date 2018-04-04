@@ -25,7 +25,7 @@ client = discord.Client()
 # When bot is ready
 @client.event
 async def on_ready():
-    if config['logging']['server'] is None or config['logging']['channel'] is None:
+    if config['logging']['server'] is not None and config['logging']['channel'] is not None:
         patt.log_channel = client.get_guild(config['logging']['server']).get_channel(config['logging']['channel'])
     print('------------------------------')
     print('Logged in as')
