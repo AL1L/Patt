@@ -4,6 +4,7 @@ import importlib
 from pathlib import Path
 import datetime
 
+
 class Patt(object):
     client = None
     database = None
@@ -15,8 +16,7 @@ class Patt(object):
     dbl_token = None,
     config = {},
     oxford_dictionaries = {}
-    
-    
+
     def __init__(self, discord_token=None, apiai_token=None, client=None, database=None, cursor=None, start_time=0, log_channel=None, dbl_token=None, config={}, oxford_dictionaries={}):
         self.client = client
         self.database = database
@@ -28,11 +28,13 @@ class Patt(object):
         self.dbl_token = dbl_token
         self.config = config
         self.oxford_dictionaries = oxford_dictionaries
-    
+
     def run(self):
         self.client.run(self.discord_token)
-        
+
 # Intent context class
+
+
 class IntentContext(object):
     name = ""
     id = ""
@@ -46,7 +48,8 @@ class IntentContext(object):
     request = None
     user = None
     patt = None
-    
+
+
 class User(object):
     discard_user = None
     id = 0
@@ -55,9 +58,12 @@ class User(object):
     language = 'en'
     nickname = None
 
-async def log(patt: Patt, f: dict, inline=True, footer=None, title=None, color=None, send=True, image=None, thumbnail=None):
-    embed: discord.Embed = discord.Embed()
-    for k,v in f.items():
+
+async def log(patt: Patt, f: dict, inline: bool=True, footer: str=None, title: str=None, color: discord.Colour=None, send: bool=True, image: str=None, thumbnail: str=None, author: discord.abc.User=None, content: str='') -> discord.Embed:
+    if color is None:
+        color = discord.Colour.green()
+    embed: discord.Embed = discord.Embed(color=color)
+    for k, v in f.items():
         if v is not None:
             embed.add_field(name=str(k), value=str(v), inline=inline)
     if footer is not None:
@@ -68,20 +74,15 @@ async def log(patt: Patt, f: dict, inline=True, footer=None, title=None, color=N
         embed.set_image(url=image)
     if thumbnail is not None:
         embed.set_thumbnail(url=thumbnail)
-
-    if color is None:
-        color = discord.Colour.green()
-
-    embed.color = color
-
-    if send: 
-        await patt.log_channel.send('', embed=embed)
+    if author is not None:
+        embed.set_author(name=author.display_name + '#' + author.discriminator +
+                         '` ('+str(author.id)+')', icon_url=author.avatar_url)
+    if send:
+        await patt.log_channel.send(content, embed=embed)
     return embed
-    
-    
-    
-    
-def get_user(patt: Patt, id: int):
+
+
+def get_user(patt: Patt, id: int) -> User:
     user = User()
     user.discard_user = patt.client.get_user(id)
     user.id = int(id)
@@ -94,9 +95,11 @@ def get_user(patt: Patt, id: int):
         user.language = data[2]
         user.nickname = data[3]
     else:
-        patt.cursor.execute("INSERT INTO users VALUES('{}', NULL, 'en', NULL)".format(user.id))
+        patt.cursor.execute(
+            "INSERT INTO users VALUES('{}', NULL, 'en', NULL)".format(user.id))
         patt.database.commit()
-        
+    return user
+
 
 # Intent context class
 class Intent(object):
@@ -105,10 +108,10 @@ class Intent(object):
         return
 
 
-def get_intent(name: str):
+def get_intent(name: str) -> Intent:
     intent_directory = "intents/{name}/".format(name=name)
-    intent_file = Path("{}/intent.py".format(intent_directory)) 
-    
+    intent_file = Path("{}/intent.py".format(intent_directory))
+
     if not intent_file.is_file():
         return None
 
@@ -119,22 +122,23 @@ def get_intent(name: str):
     return intent_sk.Intent()
 
 
-def format_ms_time(ms: int):
+def format_ms_time(ms: int) -> str:
     stamp = int(ms)
     stamp = stamp / 1000
     time = datetime.datetime.fromtimestamp(stamp)
     return time.strftime("%B %d, %Y - %H:%M:%S.%f (UTC)")
 
 
-def format_ms_time_simple(ms:int):
+def format_ms_time_simple(ms: int) -> str:
     stamp = int(ms)
     stamp = stamp / 1000
     time = datetime.datetime.fromtimestamp(stamp)
     return time.strftime("%B %d, %Y - %I:%M %p")
-    
-def get_hex_color(dColor: discord.Colour):
+
+
+def get_hex_color(dColor: discord.Colour) -> str:
     r = hex(dColor.r)[2:]
     g = hex(dColor.g)[2:]
     b = hex(dColor.b)[2:]
-    color = '{}{}{}'.format(r,g,b)
+    color = '{}{}{}'.format(r, g, b)
     return color

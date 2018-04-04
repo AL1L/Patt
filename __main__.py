@@ -26,7 +26,8 @@ client = discord.Client()
 @client.event
 async def on_ready():
     if config['logging']['server'] is not None and config['logging']['channel'] is not None:
-        patt.log_channel = client.get_guild(config['logging']['server']).get_channel(config['logging']['channel'])
+        patt.log_channel = client.get_guild(
+            config['logging']['server']).get_channel(config['logging']['channel'])
     print('------------------------------')
     print('Logged in as')
     print(client.user.name)
@@ -95,7 +96,8 @@ async def on_guild_remove(svr):
             'End Time': u.format_ms_time(start_time + time_took)
         }, title='Removed from Guild', footer="\U000023F3 Took {}ms".format(time_took), thumbnail=svr.icon_url, color=discord.Colour.red())
     await update_guild_count()
-    
+
+
 async def update_guild_count():
     if patt.dbl_token is None:
         return
@@ -105,10 +107,9 @@ async def update_guild_count():
     r = await aiohttp.request('POST', 'https://discordbots.org/api/bots/{}/stats'.format(client.user.id), headers=hd, data=pl)
     # print(r)
     return r
-    
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     print('------------------------------')
     print('Parameters: {}'.format(sys.argv))
     config = None
@@ -119,7 +120,7 @@ if __name__ == "__main__":
         print('Missing or invalid config file.')
         print(e)
         quit(1)
-    
+
     if 'discord_token' not in config or \
        'apiai_token' not in config or \
        'dbl_token' not in config or \
@@ -130,13 +131,13 @@ if __name__ == "__main__":
         print('------------------------------')
         print('Invalid config file.')
         quit(1)
-    
+
     if 'server' not in config['logging'] or \
        'channel' not in config['logging']:
         print('------------------------------')
         print('Invalid logging in config file.')
         quit(1)
-    
+
     if 'id' not in config['oxford_dictionaries'] or \
        'key' not in config['oxford_dictionaries']:
         print('------------------------------')
@@ -152,7 +153,7 @@ if __name__ == "__main__":
         print('------------------------------')
         print('Invalid databse in config file.')
         quit(1)
-    
+
     cur = None
     # DB setup
     if config['database']['type'] == 'SQLite':
@@ -163,21 +164,21 @@ if __name__ == "__main__":
         print('------------------------------')
         print('Invalid databse type in config file.')
         quit(1)
-        
-    
-    
+
     data = cur.fetchone()
-    
+
     print("SQLite version: {}".format(data[0]))
     print('------------------------------')
-    
+
     # Setup logging
     logger = logging.getLogger('discord')
     logger.setLevel(logging.DEBUG)
-    handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-    handler.setFormatter(logging.Formatter('%(asctime)s|%(levelname)s|%(name)s| %(message)s'))
+    handler = logging.FileHandler(
+        filename='discord.log', encoding='utf-8', mode='w')
+    handler.setFormatter(logging.Formatter(
+        '%(asctime)s|%(levelname)s|%(name)s| %(message)s'))
     logger.addHandler(handler)
-    
+
     patt = u.Patt(
         discord_token=config['discord_token'],
         apiai_token=config['apiai_token'],
@@ -189,7 +190,7 @@ if __name__ == "__main__":
         dbl_token=config['dbl_token'],
         oxford_dictionaries=config['oxford_dictionaries']
     )
-    
+
     print('Starting Patt...')
-    
+
     patt.run()
