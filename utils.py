@@ -55,7 +55,7 @@ class User(object):
     language = 'en'
     nickname = None
 
-async def log(patt: Patt, f: dict, inline=True, footer=None, title=None, color=None, send=True image=None, thumbnail=None):
+async def log(patt: Patt, f: dict, inline=True, footer=None, title=None, color=None, send=True, image=None, thumbnail=None):
     embed: discord.Embed = discord.Embed()
     for k,v in f.items():
         if v is not None:
