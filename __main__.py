@@ -70,7 +70,7 @@ async def on_guild_join(svr):
         embed = await u.log(patt, {
             'Guild': '`'+svr.name+'` _('+svr.id+')_',
             'Owner': '`'+svr.owner.name+'#'+svr.owner.discriminator+'` _('+svr.owner.id+')_',
-            'Users': len(svr.members)),
+            'Users': len(svr.members),
             'Is Large': svr.large,
             'Start Time': u.format_ms_time(start_time),
             'End Time': u.format_ms_time(start_time + time_took)
@@ -89,7 +89,7 @@ async def on_guild_remove(svr):
         embed = await u.log(patt, {
             'Guild': '`'+svr.name+'` _('+svr.id+')_',
             'Owner': '`'+svr.owner.name+'#'+svr.owner.discriminator+'` _('+svr.owner.id+')_',
-            'Users': len(svr.members)),
+            'Users': len(svr.members),
             'Is Large': svr.large,
             'Start Time': u.format_ms_time(start_time),
             'End Time': u.format_ms_time(start_time + time_took)
