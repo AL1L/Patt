@@ -96,7 +96,7 @@ def get_user(patt: Patt, id: int) -> User:
         user.nickname = data[3]
     else:
         patt.cursor.execute(
-            "INSERT INTO users VALUES('{}', NULL, 'en', NULL)".format(user.id))
+            "INSERT INTO users VALUES('{}', NULL, 'en', NULL, 0)".format(user.id))
         patt.database.commit()
     return user
 
