@@ -25,9 +25,8 @@ client = discord.Client()
 # When bot is ready
 @client.event
 async def on_ready():
-    if config['logging'] is not False:
-        if 'server' in config['logging'] and 'channel' in config['logging']:
-            patt.log_channel = client.get_guild(config['logging']['server']).get_channel(config['logging']['channel'])
+    if config['logging']['server'] is None or config['logging']['channel'] is None:
+        patt.log_channel = client.get_guild(config['logging']['server']).get_channel(config['logging']['channel'])
     print('------------------------------')
     print('Logged in as')
     print(client.user.name)
@@ -149,13 +148,16 @@ if __name__ == "__main__":
     config = None
     try:
         config = json.load(open('config.json'))
-    except Exception:
+    except Exception as e:
         print('------------------------------')
         print('Missing or invalid config file.')
+        print(e)
         quit(1)
     
     if 'discord_token' not in config or \
        'apiai_token' not in config or \
+       'dbl_token' not in config or \
+       'oxford_dictionaries' not in config or \
        'logging' not in config or \
        'admins' not in config or \
        'database' not in config:
@@ -163,6 +165,18 @@ if __name__ == "__main__":
         print('Invalid config file.')
         quit(1)
     
+    if 'server' not in config['logging'] or \
+       'channel' not in config['logging']:
+        print('------------------------------')
+        print('Invalid logging in config file.')
+        quit(1)
+    
+    if 'id' not in config['oxford_dictionaries'] or \
+       'key' not in config['oxford_dictionaries']:
+        print('------------------------------')
+        print('Invalid oxford dictionary app in config file.')
+        quit(1)
+
     if 'type' not in config['database'] or \
        'database' not in config['database'] or \
        'username' not in config['database'] or \
@@ -205,10 +219,10 @@ if __name__ == "__main__":
         database=db,
         cursor=cur,
         start_time=sk_start_time,
-        config=config
+        config=config,
+        dbl_token=config['dbl_token'],
+        oxford_dictionaries=config['oxford_dictionaries']
     )
-    if 'dbl_token' in config:
-        patt.dbl_token=config['dbl_token']
     
     print('Starting Patt...')
     

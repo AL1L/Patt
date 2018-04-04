@@ -13,10 +13,11 @@ class Patt(object):
     apiai_token = None
     discord_token = None
     dbl_token = None,
-    config = {}
+    config = {},
+    oxford_dictionaries = {}
     
     
-    def __init__(self, discord_token=None, apiai_token=None, client=None, database=None, cursor=None, start_time=0, log_channel=None, dbl_token=None, config={}):
+    def __init__(self, discord_token=None, apiai_token=None, client=None, database=None, cursor=None, start_time=0, log_channel=None, dbl_token=None, config={}, oxford_dictionaries={}):
         self.client = client
         self.database = database
         self.cursor = cursor
@@ -26,6 +27,7 @@ class Patt(object):
         self.discord_token = discord_token
         self.dbl_token = dbl_token
         self.config = config
+        self.oxford_dictionaries = oxford_dictionaries
     
     def run(self):
         self.client.run(self.discord_token)

@@ -1,6 +1,15 @@
 {
     "discord_token": "",
     "apiai_token": "",
+    "dbl_token": null,
+    "oxford_dictionaries": {
+        "id": null,
+        "key": null
+    },
+    "logging": {
+        "server": null,
+        "channel": null
+    },
     "admins": [],
     "database": {
         "type": "SQLite",

@@ -7,3 +7,4 @@ db.db
 *.db
 start.sh
 config.json
+*.bat
