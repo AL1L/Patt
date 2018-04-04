@@ -55,7 +55,7 @@ class User(object):
     language = 'en'
     nickname = None
 
-async def log(patt: Patt, f: dict, inline=True, footer=None, title=None, color=discord.Colour.green(), send=True image=None, thumbnail=None):
+async def log(patt: Patt, f: dict, inline=True, footer=None, title=None, color=None, send=True image=None, thumbnail=None):
     embed: discord.Embed = discord.Embed()
     for k,v in f.items():
         if v is not None:
@@ -68,6 +68,9 @@ async def log(patt: Patt, f: dict, inline=True, footer=None, title=None, color=d
         embed.set_image(url=image)
     if thumbnail is not None:
         embed.set_thumbnail(url=thumbnail)
+
+    if color is None:
+        color = discord.Colour.green()
 
     embed.color = color
 
