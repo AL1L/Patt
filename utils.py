@@ -55,11 +55,24 @@ class User(object):
     language = 'en'
     nickname = None
 
-def log(patt: Patt, f: dict, inline=True):
+async def log(patt: Patt, f: dict, inline=True, footer=None, title=None, color=discord.Colour.green(), send=True image=None, thumbnail=None):
     embed: discord.Embed = discord.Embed()
     for k,v in f.items():
         if v is not None:
             embed.add_field(name=str(k), value=str(v), inline=inline)
+    if footer is not None:
+        embed.set_footer(text=footer)
+    if title is not None:
+        embed.title = title
+    if image is not None:
+        embed.set_image(url=image)
+    if thumbnail is not None:
+        embed.set_thumbnail(url=thumbnail)
+
+    embed.color = color
+
+    if send: 
+        await patt.log_channel.send('', embed=embed)
     return embed
     
     

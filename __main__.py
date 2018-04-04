@@ -35,15 +35,11 @@ async def on_ready():
     # await client.change_presence(game=discord.Game(name='Talk to me!'))
     if patt.log_channel is not None:
         time_took = int(round(time.time() * 1000)) - sk_start_time
-        embed = u.log(patt, {
+        embed = await u.log(patt, {
             'Start Time': u.format_ms_time(sk_start_time),
             'Ready At': u.format_ms_time(sk_start_time + time_took),
-            'pid': os.getpid()
-        })
-        embed.title = 'Bot Started'
-        embed.color = discord.Colour.green()
-        embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-        await patt.log_channel.send('', embed=embed)
+            'PID': os.getpid()
+        }, title='Bot Started', footer="\U000023F3 Took {}ms".format(time_took))
 
 
 # When a message is sent that can be read by Patt
@@ -71,28 +67,14 @@ async def on_guild_join(svr):
     db.commit()
     if patt.log_channel is not None:
         time_took = int(round(time.time() * 1000)) - start_time
-        embed = discord.Embed()
-        embed.description = '**Guild:**\n{guild}\n\n' + \
-                            '**Owner:**\n{owner}\n\n' + \
-                            '**Users:**\n{user_amt}\n\n' + \
-                            '**Is Large:**\n{is_large}\n\n' + \
-                            '**Start Time:**\n{start}\n\n' + \
-                            '**End Time:**\n{end}\n\n'
-        embed.description = embed.description.format(owner='`{owner_name}#{owner_discriminator}` _({owner_id})_',
-                                                     guild='`{guild_name}` _({guild_id})_',
-                                                     start=u.format_ms_time(start_time),
-                                                     end=u.format_ms_time(start_time + time_took),
-                                                     is_large=svr.large,
-                                                     user_amt=len(svr.members))
-        embed.description = embed.description.format(owner_name=svr.owner.name,
-                                                     owner_discriminator=svr.owner.discriminator,
-                                                     owner_id=svr.owner.id, guild_name=svr.name,
-                                                     guild_id=svr.id)
-        embed.set_thumbnail(url=svr.icon_url)
-        embed.title = 'Added to Guild'
-        embed.color = discord.Colour.green()
-        embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-        await log_channel.send('', embed=embed)
+        embed = await u.log(patt, {
+            'Guild': '`'+svr.name+'` _('+svr.id+')_'
+            'Owner': '`'+svr.owner.name+'#'+svr.owner.discriminator+'` _('+svr.owner.id+')_'
+            'Users': len(svr.members))
+            'Is Large': svr.large
+            'Start Time': u.format_ms_time(start_time)
+            'End Time': u.format_ms_time(start_time + time_took)
+        }, title='Added to Guild', footer="\U000023F3 Took {}ms".format(time_took), thumbnail=svr.icon_url)
     await update_guild_count()
 
 
@@ -104,28 +86,14 @@ async def on_guild_remove(svr):
     db.commit()
     if patt.log_channel is not None:
         time_took = int(round(time.time() * 1000)) - start_time
-        embed = discord.Embed()
-        embed.description = '**Guild:**\n{guild}\n\n' + \
-                            '**Owner:**\n{owner}\n\n' + \
-                            '**Users:**\n{user_amt}\n\n' + \
-                            '**Is Large:**\n{is_large}\n\n' + \
-                            '**Start Time:**\n{start}\n\n' + \
-                            '**End Time:**\n{end}\n\n'
-        embed.description = embed.description.format(owner='`{owner_name}#{owner_discriminator}` _({owner_id})_',
-                                                     guild='`{guild_name}` _({guild_id})_',
-                                                     start=u.format_ms_time(start_time),
-                                                     end=u.format_ms_time(start_time + time_took),
-                                                     is_large=svr.large,
-                                                     user_amt=len(svr.members))
-        embed.description = embed.description.format(owner_name=svr.owner.name,
-                                                     owner_discriminator=svr.owner.discriminator,
-                                                     owner_id=svr.owner.id, guild_name=svr.name,
-                                                     guild_id=svr.id)
-        embed.set_thumbnail(url=svr.icon_url)
-        embed.title = 'Removed from Guild'
-        embed.color = discord.Colour.red()
-        embed.set_footer(text="\U000023F3 Took {}ms".format(time_took))
-        await patt.log_channel.send('', embed=embed)
+        embed = await u.log(patt, {
+            'Guild': '`'+svr.name+'` _('+svr.id+')_'
+            'Owner': '`'+svr.owner.name+'#'+svr.owner.discriminator+'` _('+svr.owner.id+')_'
+            'Users': len(svr.members))
+            'Is Large': svr.large
+            'Start Time': u.format_ms_time(start_time)
+            'End Time': u.format_ms_time(start_time + time_took)
+        }, title='Removed from Guild', footer="\U000023F3 Took {}ms".format(time_took), thumbnail=svr.icon_url, color=discord.Colour.red())
     await update_guild_count()
     
 async def update_guild_count():
