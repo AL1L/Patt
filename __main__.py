@@ -41,19 +41,20 @@ async def on_ready():
             'Ready At': u.format_ms_time(sk_start_time + time_took),
             'PID': os.getpid()
         }, title='Bot Started', footer="\U000023F3 Took {}ms".format(time_took))
-    
-    # Go through each guild and join voice channels named `patt`
+
+    # Go through each guild and join voice channels named `patt` if there are members in it
     if discord.opus.is_loaded():
         print('Joining voice channels')
         for g in client.guilds:
             print('    ' + g.name)
             if g.voice_client is None:
                 for c in g.voice_channels:
-                    p = c.permissions_for(g.me)
-                    if p.connect and p.speak:
-                        if c.name.lower() == 'patt':
-                            print('        ' + c.name)
-                            await c.connect()
+                    if len(c.members) > 0:
+                        p = c.permissions_for(g.me)
+                        if p.connect and p.speak:
+                            if c.name.lower() == 'patt':
+                                print('        ' + c.name)
+                                await c.connect()
         print('Done')
 
 
@@ -75,9 +76,29 @@ async def on_message(msg):
 
 
 @client.event
+async def on_voice_state_update(member, before, after):
+    channel: discord.VoiceChannel = after.channel
+    bchannel: discord.VoiceChannel = before.channel
+    vc = member.guild.voice_client
+    if member.id == client.user.id:
+        return
+    if bchannel is not None:
+        if vc is not None and len(bchannel.members) == 1:
+            if vc.channel.id == bchannel.id:
+                await vc.disconnect()
+                vc = None
+    if channel is not None:
+        if vc is None and len(channel.members) > 0:
+            p = channel.permissions_for(channel.guild.me)
+            if p.connect and p.speak:
+                if channel.name.lower() == 'patt':
+                    await channel.connect()
+
+
+@client.event
 async def on_guild_channel_create(channel):
     if isinstance(channel, discord.VoiceChannel):
-        if channel.guild.voice_client is None:
+        if channel.guild.voice_client is None and len(channel.members) > 0:
             p = channel.permissions_for(channel.guild.me)
             if p.connect and p.speak:
                 if channel.name.lower() == 'patt':
@@ -87,7 +108,7 @@ async def on_guild_channel_create(channel):
 @client.event
 async def on_guild_channel_update(old, channel):
     if isinstance(channel, discord.VoiceChannel):
-        if channel.guild.voice_client is None:
+        if channel.guild.voice_client is None and len(channel.members) > 0:
             p = channel.permissions_for(channel.guild.me)
             if p.connect and p.speak:
                 if channel.name.lower() == 'patt':
