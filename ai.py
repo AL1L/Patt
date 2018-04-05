@@ -11,7 +11,7 @@ import aiohttp
 from gtts import gTTS
 import os
 import hashlib
-
+import re
 
 async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
     failed = False
@@ -90,12 +90,23 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
 
     voice = False
     # say in voice
-    if guild.me.voice is not None and rtn.strip() != '':
+    if msg.channel.name == 'patt' and guild.voice_client is not None and rtn.strip() != '':
         try:
             voice = guild.voice_client
-            file = 'tts/'+hashlib.md5(rtn.encode()).hexdigest()+".mp3"
+            voice_msg = rtn
+            p = re.compile("<(#|@[!]?|&)(\d{18})>")
+            for m in p.findall(voice_msg):
+                if m[0] == "@" or m[0   ] == "@!":
+                    g = patt.client.get_user(int(m[1]))
+                    if g is not None:
+                        voice_msg = voice_msg.replace('<{}{}>'.format(*m), g.display_name)
+                elif m[0] == '#':
+                    g = patt.client.get_channel(int(m[1]))
+                    if g is not None:
+                        voice_msg = voice_msg.replace('<{}{}>'.format(*m), g.name)
+            file = 'tts/'+hashlib.md5(voice_msg.encode()).hexdigest()+".mp3"
             if not os.path.exists(file):
-                tts = gTTS(text=rtn, lang='en')
+                tts = gTTS(text=voice_msg, lang='en')
                 tts.save(file)
             source = discord.FFmpegPCMAudio(file)
             if guild.voice_client.is_playing() == False:

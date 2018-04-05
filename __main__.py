@@ -41,6 +41,20 @@ async def on_ready():
             'Ready At': u.format_ms_time(sk_start_time + time_took),
             'PID': os.getpid()
         }, title='Bot Started', footer="\U000023F3 Took {}ms".format(time_took))
+    
+    # Go through each guild and join voice channels named `patt`
+    if discord.opus.is_loaded():
+        print('Joining voice channels')
+        for g in client.guilds:
+            print('    ' + g.name)
+            if g.voice_client is None:
+                for c in g.voice_channels:
+                    p = c.permissions_for(g.me)
+                    if p.connect and p.speak:
+                        if c.name == 'patt':
+                            print('        ' + c.name)
+                            await c.connect()
+        print('Done')
 
 
 # When a message is sent that can be read by Patt
@@ -58,6 +72,26 @@ async def on_message(msg):
         await ai.on_message(patt, msg, start_time)
         return
     return
+
+
+@client.event
+async def on_guild_channel_create(channel):
+    if isinstance(channel, discord.VoiceChannel):
+        if channel.guild.voice_client is None:
+            p = channel.permissions_for(channel.guild.me)
+            if p.connect and p.speak:
+                if channel.name == 'patt':
+                    await channel.connect()
+
+
+@client.event
+async def on_guild_channel_update(old, channel):
+    if isinstance(channel, discord.VoiceChannel):
+        if channel.guild.voice_client is None:
+            p = channel.permissions_for(channel.guild.me)
+            if p.connect and p.speak:
+                if channel.name == 'patt':
+                    await channel.connect()
 
 
 # When Patt joins a Guild
