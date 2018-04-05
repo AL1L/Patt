@@ -4,9 +4,7 @@ import importlib
 from pathlib import Path
 import datetime
 
-"""
-Patt's main object, sent almost everywhere within the bot
-"""
+
 class Patt(object):
     client = None
     database = None
@@ -34,9 +32,9 @@ class Patt(object):
     def run(self):
         self.client.run(self.discord_token)
 
-"""
-Context for an intent request
-"""
+# Intent context class
+
+
 class IntentContext(object):
     name = ""
     id = ""
@@ -51,9 +49,7 @@ class IntentContext(object):
     user = None
     patt = None
 
-"""
-Bot user object, not the same as discord.py's
-"""
+
 class User(object):
     discard_user = None
     id = 0
@@ -62,14 +58,7 @@ class User(object):
     language = 'en'
     nickname = None
 
-"""
-Create log from params and sends it to the Log Channel
 
-Returns
--------
-discord.Embed
-    Created log embed object
-"""
 async def log(patt: Patt, f: dict, inline: bool=True, footer: str=None, title: str=None, color: discord.Colour=None, send: bool=True, image: str=None, thumbnail: str=None, author: discord.abc.User=None, content: str='') -> discord.Embed:
     if color is None:
         color = discord.Colour.green()
@@ -87,32 +76,18 @@ async def log(patt: Patt, f: dict, inline: bool=True, footer: str=None, title: s
         embed.set_thumbnail(url=thumbnail)
     if author is not None:
         embed.set_author(name=author.display_name + '#' + author.discriminator +
-                         '` ('+str(author.id)+')', icon_url=author.avatar_url)
+                         ' ('+str(author.id)+')', icon_url=author.avatar_url)
     if send:
         await patt.log_channel.send(content, embed=embed)
     return embed
 
 
-"""
-Get user info, not the same User as discord.py's
-
-Returns
--------
-User
-    Bot User object
-"""
 def get_user(patt: Patt, id: int) -> User:
-    # Create user object
     user = User()
-
-    # Add vars
     user.discard_user = patt.client.get_user(id)
     user.id = int(id)
-
-    # Get from database
     patt.cursor.execute("SELECT * FROM users WHERE id='{}'".format(user.id))
     data = patt.cursor.fetchone()
-    # If exists add vars, else add user to db
     if data is not None:
         if data[1] is not None:
             user.age = int(data[1])
@@ -126,27 +101,20 @@ def get_user(patt: Patt, id: int) -> User:
     return user
 
 
-"""
-Intent executor
-"""
+# Intent context class
 class Intent(object):
     @staticmethod
     async def handle(context: IntentContext):
         return
 
-"""
-Get intent executor
-"""
+
 def get_intent(name: str) -> Intent:
-    # Get intent directory and file
     intent_directory = "intents/{name}/".format(name=name)
     intent_file = Path("{}/intent.py".format(intent_directory))
 
-    # Check if exists
     if not intent_file.is_file():
         return None
 
-    # Get module and intent executor
     package = "intents.{}".format(name)
     name = 'intent'
     intent_sk = getattr(__import__(package, fromlist=[name]), name)
@@ -154,9 +122,6 @@ def get_intent(name: str) -> Intent:
     return intent_sk.Intent()
 
 
-"""
-Format time into a human readable format
-"""
 def format_ms_time(ms: int) -> str:
     stamp = int(ms)
     stamp = stamp / 1000
@@ -164,9 +129,6 @@ def format_ms_time(ms: int) -> str:
     return time.strftime("%B %d, %Y - %H:%M:%S.%f (UTC)")
 
 
-"""
-Format time into a human readable format
-"""
 def format_ms_time_simple(ms: int) -> str:
     stamp = int(ms)
     stamp = stamp / 1000
@@ -174,9 +136,6 @@ def format_ms_time_simple(ms: int) -> str:
     return time.strftime("%B %d, %Y - %I:%M %p")
 
 
-"""
-Get discord color as #RRGGBB
-"""
 def get_hex_color(dColor: discord.Colour) -> str:
     r = hex(dColor.r)[2:]
     g = hex(dColor.g)[2:]

@@ -8,17 +8,17 @@ import sys
 import json as jsonlib
 import random
 import aiohttp
+from gtts import gTTS
+import os
+import hashlib
 
 
 async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
-
-    # vars
     failed = False
     author: discord.Member = msg.author
     guild: discord.Guild = msg.guild
     channel: discord.Channel = msg.channel
-
-    # Sanitize query
+    type: discord.MessageType = msg.type
     query = msg.content \
         .replace('<@{}>'.format(patt.client.user.id), '') \
         .replace('<@!{}>'.format(patt.client.user.id), '') \
@@ -28,17 +28,11 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
         .replace('!', '') \
         .replace('`', '') \
         .strip()
-
-    # Log
     print('FR [{}] > {}'.format(author.id, query))
-
-    # Init ApiAI and make request
     ai = apiai.ApiAI(patt.apiai_token)
     request = ai.text_request()
     request.session_id = author.id
     request.query = query
-
-    # Parse and format response
     response = request.getresponse()
     json_raw = response.read()
     json = j.loads(json_raw)
@@ -55,7 +49,6 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
     if rtn is "" or rtn is None:
         rtn = "Sorry, i didn't understand what you said."
 
-    # Create intent context
     context = None
     if 'intentName' in json['result']['metadata']:
         context = u.IntentContext()
@@ -70,7 +63,6 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
         context.request = json
         context.user = u.get_user(patt, msg.author.id)
 
-    # Execute intent code
     if context is not None:
         if await handle_payload(json, context):
             intent = u.get_intent(context.name)
@@ -82,13 +74,10 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
                     failed = True
                     await msg.channel.send('`There was an error when handling that request`')
                     error = traceback.format_exc()
-                    print(e)
+                    print(error)
         rtn = context.output
 
-    # Log resonse 
     print('TO [{}] < {}'.format(author.id, rtn))
-
-    # Send response
     if rtn is '' or rtn is None:
         rtn = ' '
     if context is not None:
@@ -99,7 +88,26 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
     else:
         await msg.channel.send(rtn)
 
-    # Log to channel
+    voice = False
+    # say in voice
+    if guild.me.voice is not None and rtn.strip() != '':
+        try:
+            voice = guild.voice_client
+            file = 'tts/'+hashlib.md5(rtn.encode()).hexdigest()+".mp3"
+            if not os.path.exists(file):
+                tts = gTTS(text=rtn, lang='en')
+                tts.save(file)
+            source = discord.FFmpegPCMAudio(file)
+            if guild.voice_client.is_playing() == False:
+                voice.play(source)
+            voice = True
+        except Exception as e:
+            failed = True
+            error = traceback.format_exc()
+            print(error)
+        
+    # Log
+
     if context is not None and patt.log_channel is not None:
         time_took = int(round(time.time() * 1000)) - start_time
         content = ''
@@ -117,6 +125,8 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
         }
         if context.output_embed is not None:
             dic['Embed'] = True
+        if voice:
+            dic['Voice'] = True
         if isinstance(msg.channel, discord.abc.GuildChannel):
             dic['Guild'] = '`' + msg.guild.name + \
                 '` (' + str(msg.guild.id) + ')'
@@ -131,6 +141,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
 
 
 async def handle_payload(json, context):
+    # print(jsonlib.dumps(json))
     # Make sure there is a payload
     if 'result' not in json:
         return
@@ -151,3 +162,11 @@ async def handle_payload(json, context):
         context.output = random.choice(payload['nsfw'])
         return False
     return True
+
+
+async def getJSONImage(url, name):
+    async with aiohttp.request('GET', url) as r:
+        if r.status == 200:
+            js = await r.json()
+            url = js[name]
+            return url

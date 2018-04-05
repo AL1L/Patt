@@ -13,13 +13,35 @@ class Intent(u.Intent):
     
     @staticmethod
     async def handle(context: u.IntentContext):
+        patt: u.Patt = context.patt
         if context.message.author.id in allowed_users:
+
             embed = discord.Embed()
             embed.title = "Shell"
             embed.color = discord.Colour.green()
             
             client = context.patt.client
             cmd = context.raw_input.replace('<@{}>'.format(client.user.id), '').replace('<@!{}>'.format(client.user.id), '').strip()[1:].strip()
+        
+            if cmd == 'join':
+                author = context.message.author
+                if author.voice is None:
+                    context.output = 'Not in voice channel!'
+                    return
+                if context.message.guild.voice_client is not None:
+                    context.output = 'Already joined'
+                    return
+                channel = await author.voice.channel.connect()
+                context.output = 'Joined'
+                return
+            if cmd == 'leave':
+                author = context.message.author
+                if context.message.guild.voice_client is None:
+                    context.output = 'Not in voice channel'
+                    return
+                channel = await context.message.guild.voice_client.disconnect()
+                context.output = 'Disconnected'
+                return
             output = ""
             try:
                 if cmd.startswith('eval '):
