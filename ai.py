@@ -93,7 +93,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
     if msg.channel.name.lower() == 'patt' and guild.voice_client is not None and rtn.strip() != '':
         try:
             voice = guild.voice_client
-            voice_msg = rtn
+            voice_msg = rtn.replace('`', '')
             p = re.compile("<(#|@[!]?|&)(\d{18})>")
             for m in p.findall(voice_msg):
                 if m[0] == "@" or m[0   ] == "@!":
