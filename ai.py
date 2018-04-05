@@ -90,7 +90,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
 
     voice = False
     # say in voice
-    if msg.channel.name == 'patt' and guild.voice_client is not None and rtn.strip() != '':
+    if msg.channel.name.lower() == 'patt' and guild.voice_client is not None and rtn.strip() != '':
         try:
             voice = guild.voice_client
             voice_msg = rtn

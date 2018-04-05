@@ -51,7 +51,7 @@ async def on_ready():
                 for c in g.voice_channels:
                     p = c.permissions_for(g.me)
                     if p.connect and p.speak:
-                        if c.name == 'patt':
+                        if c.name.lower() == 'patt':
                             print('        ' + c.name)
                             await c.connect()
         print('Done')
@@ -66,7 +66,7 @@ async def on_message(msg):
     # Channel cannot be private
     if client.user.id == msg.author.id or msg.content.startswith('#') or msg.author.bot:
         return
-    if '<@{}>'.format(client.user.id) in msg.content or '<@!{}>'.format(client.user.id) in msg.content or isinstance(msg.channel, discord.abc.PrivateChannel) or msg.channel.name == 'patt':
+    if '<@{}>'.format(client.user.id) in msg.content or '<@!{}>'.format(client.user.id) in msg.content or isinstance(msg.channel, discord.abc.PrivateChannel) or msg.channel.name.lower() == 'patt':
         await msg.channel.trigger_typing()
         importlib.reload(ai)
         await ai.on_message(patt, msg, start_time)
@@ -80,7 +80,7 @@ async def on_guild_channel_create(channel):
         if channel.guild.voice_client is None:
             p = channel.permissions_for(channel.guild.me)
             if p.connect and p.speak:
-                if channel.name == 'patt':
+                if channel.name.lower() == 'patt':
                     await channel.connect()
 
 
@@ -90,7 +90,7 @@ async def on_guild_channel_update(old, channel):
         if channel.guild.voice_client is None:
             p = channel.permissions_for(channel.guild.me)
             if p.connect and p.speak:
-                if channel.name == 'patt':
+                if channel.name.lower() == 'patt':
                     await channel.connect()
 
 
