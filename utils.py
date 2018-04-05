@@ -32,23 +32,6 @@ class Patt(object):
     def run(self):
         self.client.run(self.discord_token)
 
-# Intent context class
-
-
-class IntentContext(object):
-    name = ""
-    id = ""
-    input = ""
-    raw_input = ""
-    apiai = None
-    output = ""
-    output_embed = None
-    message = None
-    start_time = 0
-    request = None
-    user = None
-    patt = None
-
 
 class User(object):
     discard_user = None
@@ -57,6 +40,22 @@ class User(object):
     nsfw_enabled = False
     language = 'en'
     nickname = None
+
+
+class IntentContext(object):
+    name: str = ""
+    id: int = ""
+    input: str = ""
+    raw_input: str = ""
+    apiai = None
+    output: str = ""
+    output_embed: discord.Embed = None
+    message: str = None
+    start_time: int = 0
+    request: dict = None
+    user: User = None
+    patt: Path = None
+    voice: str = ""
 
 
 async def log(patt: Patt, f: dict, inline: bool=True, footer: str=None, title: str=None, color: discord.Colour=None, send: bool=True, image: str=None, thumbnail: str=None, author: discord.abc.User=None, content: str='') -> discord.Embed:

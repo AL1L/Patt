@@ -57,6 +57,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
         context.input = query
         context.raw_input = msg.content
         context.output = rtn
+        context.voice = context.output
         context.patt = patt
         context.message = msg
         context.start_time = start_time
@@ -70,13 +71,13 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
                 try:
                     # Execute the intent module
                     await intent.handle(context)
-                except Exception as e:
+                except Exception:
                     failed = True
                     await msg.channel.send('`There was an error when handling that request`')
                     error = traceback.format_exc()
                     print(error)
         rtn = context.output
-
+    
     print('TO [{}] < {}'.format(author.id, rtn))
     if rtn is '' or rtn is None:
         rtn = ' '
@@ -90,32 +91,33 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
 
     voice = False
     # say in voice
-    if msg.channel.name.lower() == 'patt' and guild.voice_client is not None and rtn.strip() != '':
-        try:
-            voice = guild.voice_client
-            voice_msg = rtn.replace('`', '')
-            p = re.compile("<(#|@[!]?|&)(\d{18})>")
-            for m in p.findall(voice_msg):
-                if m[0] == "@" or m[0   ] == "@!":
-                    g = patt.client.get_user(int(m[1]))
-                    if g is not None:
-                        voice_msg = voice_msg.replace('<{}{}>'.format(*m), g.display_name)
-                elif m[0] == '#':
-                    g = patt.client.get_channel(int(m[1]))
-                    if g is not None:
-                        voice_msg = voice_msg.replace('<{}{}>'.format(*m), g.name)
-            file = 'tts/'+hashlib.md5(voice_msg.encode()).hexdigest()+".mp3"
-            if not os.path.exists(file):
-                tts = gTTS(text=voice_msg, lang='en')
-                tts.save(file)
-            source = discord.FFmpegPCMAudio(file)
-            if guild.voice_client.is_playing() == False:
-                voice.play(source)
-            voice = True
-        except Exception as e:
-            failed = True
-            error = traceback.format_exc()
-            print(error)
+    if msg.channel.name.lower() == 'patt' and guild.voice_client is not None and context.voice is not None:
+        if str(context.voice).strip() != '':
+            try:
+                voice = guild.voice_client
+                voice_msg = context.voice.replace('`', '')
+                p = re.compile("<(#|@[!]?|&)(\d{18})>")
+                for m in p.findall(voice_msg):
+                    if m[0] == "@" or m[0   ] == "@!":
+                        g = patt.client.get_user(int(m[1]))
+                        if g is not None:
+                            voice_msg = voice_msg.replace('<{}{}>'.format(*m), g.display_name)
+                    elif m[0] == '#':
+                        g = patt.client.get_channel(int(m[1]))
+                        if g is not None:
+                            voice_msg = voice_msg.replace('<{}{}>'.format(*m), g.name)
+                file = 'tts/'+hashlib.md5(voice_msg.encode()).hexdigest()+".mp3"
+                if not os.path.exists(file):
+                    tts = gTTS(text=voice_msg, lang='en')
+                    tts.save(file)
+                source = discord.FFmpegPCMAudio(file)
+                if guild.voice_client.is_playing() == False:
+                    voice.play(source)
+                voice = True
+            except Exception as e:
+                failed = True
+                error = traceback.format_exc()
+                print(error)
         
     # Log
 
@@ -151,7 +153,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
         await u.log(patt, dic, title="Got message", content=content, color=color, footer="\U000023F3 Took {}ms".format(time_took), author=author, thumbnail=thumb)
 
 
-async def handle_payload(json, context):
+async def handle_payload(json: dict, context: u.IntentContext):
     # print(jsonlib.dumps(json))
     # Make sure there is a payload
     if 'result' not in json:
@@ -172,6 +174,27 @@ async def handle_payload(json, context):
     if 'nsfw' in payload and not context.message.channel.is_nsfw():
         context.output = random.choice(payload['nsfw'])
         return False
+    if 'voice' in payload:
+        s = payload['voice']
+        if isinstance(s, list) or isinstance(s, tuple) or isinstance(s, set):
+            context.voice = random.choice(s)
+        else:
+            context.voice = s
+            if s == 'none':
+                context.voice = None
+    if 'voiceState' in payload:
+        s = payload['voiceState']
+        c: discord.VoiceClient = context.message.guild.voice_client
+        if c is not None:
+            if s == 'pause':
+                if c.is_playing():
+                    c.pause()
+            elif s == 'stop':
+                if c.is_playing():
+                    c.stop()
+            elif s == 'resume':
+                if c.is_paused():
+                    c.resume()
     return True
 
 
