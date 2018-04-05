@@ -11,11 +11,14 @@ import aiohttp
 
 
 async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
+
+    # vars
     failed = False
     author: discord.Member = msg.author
     guild: discord.Guild = msg.guild
     channel: discord.Channel = msg.channel
-    type: discord.MessageType = msg.type
+
+    # Sanitize query
     query = msg.content \
         .replace('<@{}>'.format(patt.client.user.id), '') \
         .replace('<@!{}>'.format(patt.client.user.id), '') \
@@ -25,11 +28,17 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
         .replace('!', '') \
         .replace('`', '') \
         .strip()
+
+    # Log
     print('FR [{}] > {}'.format(author.id, query))
+
+    # Init ApiAI and make request
     ai = apiai.ApiAI(patt.apiai_token)
     request = ai.text_request()
     request.session_id = author.id
     request.query = query
+
+    # Parse and format response
     response = request.getresponse()
     json_raw = response.read()
     json = j.loads(json_raw)
@@ -46,6 +55,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
     if rtn is "" or rtn is None:
         rtn = "Sorry, i didn't understand what you said."
 
+    # Create intent context
     context = None
     if 'intentName' in json['result']['metadata']:
         context = u.IntentContext()
@@ -60,6 +70,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
         context.request = json
         context.user = u.get_user(patt, msg.author.id)
 
+    # Execute intent code
     if context is not None:
         if await handle_payload(json, context):
             intent = u.get_intent(context.name)
@@ -74,7 +85,10 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
                     print(e)
         rtn = context.output
 
+    # Log resonse 
     print('TO [{}] < {}'.format(author.id, rtn))
+
+    # Send response
     if rtn is '' or rtn is None:
         rtn = ' '
     if context is not None:
@@ -84,8 +98,8 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
             await msg.channel.send(rtn, embed=context.output_embed)
     else:
         await msg.channel.send(rtn)
-    # Log
 
+    # Log to channel
     if context is not None and patt.log_channel is not None:
         time_took = int(round(time.time() * 1000)) - start_time
         content = ''
@@ -117,7 +131,6 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
 
 
 async def handle_payload(json, context):
-    # print(jsonlib.dumps(json))
     # Make sure there is a payload
     if 'result' not in json:
         return
@@ -138,11 +151,3 @@ async def handle_payload(json, context):
         context.output = random.choice(payload['nsfw'])
         return False
     return True
-
-
-async def getJSONImage(url, name):
-    async with aiohttp.request('GET', url) as r:
-        if r.status == 200:
-            js = await r.json()
-            url = js[name]
-            return url

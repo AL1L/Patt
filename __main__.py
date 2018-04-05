@@ -1,5 +1,6 @@
 import time
 
+# Start time of script
 sk_start_time = int(round(time.time() * 1000))
 
 import discord
@@ -16,24 +17,30 @@ import json
 
 print('Loading assets...')
 
-global patt
+# Vars
 patt = None
-
 client = discord.Client()
 
 
 # When bot is ready
 @client.event
 async def on_ready():
+    # Set log channel
     if config['logging']['server'] is not None and config['logging']['channel'] is not None:
         patt.log_channel = client.get_guild(
             config['logging']['server']).get_channel(config['logging']['channel'])
+
+    # Log
     print('------------------------------')
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
     print('------------------------------')
+
+    # Set presence
     # await client.change_presence(game=discord.Game(name='Talk to me!'))
+
+    # Log to channel
     if patt.log_channel is not None:
         time_took = int(round(time.time() * 1000)) - sk_start_time
         embed = await u.log(patt, {
@@ -49,9 +56,11 @@ async def on_message(msg):
     # Start Time
     start_time = int(round(time.time() * 1000))
 
-    # Channel cannot be private
+    # Channel cannot be a bot or start with `#`
     if client.user.id == msg.author.id or msg.content.startswith('#') or msg.author.bot:
         return
+    
+    # Should bot respond? If so call AI executor
     if '<@{}>'.format(client.user.id) in msg.content or '<@!{}>'.format(client.user.id) in msg.content or isinstance(msg.channel, discord.abc.PrivateChannel) or msg.channel.name == 'patt':
         await msg.channel.trigger_typing()
         importlib.reload(ai)
@@ -64,8 +73,12 @@ async def on_message(msg):
 @client.event
 async def on_guild_join(svr):
     start_time = int(round(time.time() * 1000))
+
+    # Add server to db
     cur.execute("INSERT INTO guilds VALUES('{}')".format(svr.id))
     db.commit()
+
+    # Log to channel
     if patt.log_channel is not None:
         time_took = int(round(time.time() * 1000)) - start_time
         embed = await u.log(patt, {
@@ -76,6 +89,7 @@ async def on_guild_join(svr):
             'Start Time': u.format_ms_time(start_time),
             'End Time': u.format_ms_time(start_time + time_took)
         }, title='Added to Guild', footer="\U000023F3 Took {}ms".format(time_took), thumbnail=svr.icon_url)
+
     await update_guild_count()
 
 
@@ -83,8 +97,12 @@ async def on_guild_join(svr):
 @client.event
 async def on_guild_remove(svr):
     start_time = int(round(time.time() * 1000))
+
+    # Remove server from db
     cur.execute("DELETE FROM guilds WHERE gid='{}'".format(svr.id))
     db.commit()
+
+    # Log to channel
     if patt.log_channel is not None:
         time_took = int(round(time.time() * 1000)) - start_time
         embed = await u.log(patt, {
@@ -95,17 +113,23 @@ async def on_guild_remove(svr):
             'Start Time': u.format_ms_time(start_time),
             'End Time': u.format_ms_time(start_time + time_took)
         }, title='Removed from Guild', footer="\U000023F3 Took {}ms".format(time_took), thumbnail=svr.icon_url, color=discord.Colour.red())
+
     await update_guild_count()
 
 
 async def update_guild_count():
+    # Has dbl token
     if patt.dbl_token is None:
         return
+    
+    # Get guild amt
     amt = len(patt.client.guilds)
+
+    # Post to dbl
     pl = {'server_count': amt}
     hd = {'Authorization': patt.dbl_token}
     r = await aiohttp.request('POST', 'https://discordbots.org/api/bots/{}/stats'.format(client.user.id), headers=hd, data=pl)
-    # print(r)
+
     return r
 
 
@@ -113,6 +137,8 @@ if __name__ == "__main__":
     print('------------------------------')
     print('Parameters: {}'.format(sys.argv))
     config = None
+
+    # Check if config exists and is JSON
     try:
         config = json.load(open('config.json'))
     except Exception as e:
@@ -121,6 +147,7 @@ if __name__ == "__main__":
         print(e)
         quit(1)
 
+    # Make sure config contains correct Items
     if 'discord_token' not in config or \
        'apiai_token' not in config or \
        'dbl_token' not in config or \
@@ -179,6 +206,7 @@ if __name__ == "__main__":
         '%(asctime)s|%(levelname)s|%(name)s| %(message)s'))
     logger.addHandler(handler)
 
+    # Create Patt
     patt = u.Patt(
         discord_token=config['discord_token'],
         apiai_token=config['apiai_token'],
@@ -193,4 +221,5 @@ if __name__ == "__main__":
 
     print('Starting Patt...')
 
+    # Start bot
     patt.run()
