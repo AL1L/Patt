@@ -42,6 +42,9 @@ async def on_ready():
             'PID': os.getpid()
         }, title='Bot Started', footer="\U000023F3 Took {}ms".format(time_took))
 
+        
+    print('Serving {} users'.format(len(client.users)))
+
     # Go through each guild and join voice channels named `patt` if there are members in it
     if discord.opus.is_loaded():
         print('Joining voice channels')
