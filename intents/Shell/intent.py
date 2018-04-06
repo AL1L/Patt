@@ -5,7 +5,7 @@ import os
 import sys
 import subprocess
 import time
-
+from pytube import YouTube
 
 allowed_users = [366085504971571200, 202150484058832905]
 
@@ -16,9 +16,8 @@ class Intent(u.Intent):
         patt: u.Patt = context.patt
         if context.message.author.id in allowed_users:
 
-            embed = discord.Embed()
+            embed = discord.Embed(color=discord.Colour.green())
             embed.title = "Shell"
-            embed.color = discord.Colour.green()
             
             client = context.patt.client
             cmd = context.raw_input.replace('<@{}>'.format(client.user.id), '').replace('<@!{}>'.format(client.user.id), '').strip()[1:].strip()
@@ -41,6 +40,42 @@ class Intent(u.Intent):
                     return
                 channel = await context.message.guild.voice_client.disconnect()
                 context.output = 'Disconnected'
+                return
+            if cmd[0:2] == 'yt':
+                print('-----------------------------------------')
+                author = context.message.author
+                vc = context.message.guild.voice_client
+                if vc is None:
+                    context.output = 'Not in voice channel'
+                    return
+                yt_url = cmd[2:].strip()
+                print(yt_url)
+                yt = YouTube(yt_url)
+                video = yt.streams.filter(only_audio=True, audio_codec='opus').first()
+                video_url = video.url
+                print(video_url)
+                source = discord.FFmpegPCMAudio(video_url)
+                vc.play(source)
+                return
+            if cmd == 'play':
+                author = context.message.author
+                vc = context.message.guild.voice_client
+                if vc is None:
+                    context.output = 'Not in voice channel'
+                    return
+                video_url = cmd[4:].strip()
+                source = discord.FFmpegPCMAudio(video_url)
+                vc.play(source)
+                return
+            if cmd == 'play-test':
+                author = context.message.author
+                vc = context.message.guild.voice_client
+                if vc is None:
+                    context.output = 'Not in voice channel'
+                    return
+                video_url = context.patt.config['test_vid']['direct']
+                source = discord.FFmpegPCMAudio(video_url)
+                vc.play(source)
                 return
             output = ""
             try:
