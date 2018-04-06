@@ -1,6 +1,7 @@
 import aiohttp
 import discord
 import utils as u
+import re
 import os
 import sys
 import subprocess
@@ -13,6 +14,7 @@ class Intent(u.Intent):
     
     @staticmethod
     async def handle(context: u.IntentContext):
+        context.voice = None
         patt: u.Patt = context.patt
         if context.message.author.id in allowed_users:
 
@@ -48,14 +50,38 @@ class Intent(u.Intent):
                 if vc is None:
                     context.output = 'Not in voice channel'
                     return
+                api = 'https://api.unblockvideos.com/youtube_downloader?selector=mp4&id='
                 yt_url = cmd[2:].strip()
-                print(yt_url)
-                yt = YouTube(yt_url)
-                video = yt.streams.filter(only_audio=True, audio_codec='opus').first()
-                video_url = video.url
-                print(video_url)
-                source = discord.FFmpegPCMAudio(video_url)
-                vc.play(source)
+                p = re.compile(r"^(((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?|([\w\-]{11}))$")
+                match = p.search(yt_url).groups()
+                id = ''
+                if match[5] is not None:
+                    id = match[5]
+                elif match[7] is not None:
+                    id = match[7]
+                else:
+                    context.output = 'Invalid video url'
+                    return
+                context.output = 'Groups: `{}`\nId: `{}`'.format(match,id)
+            
+                hd = {'Accept':'application/json'}
+                async with aiohttp.request('GET', api+id, headers=hd) as r:
+                    print(r.headers['Content-Type'])
+                    if r.status == 200:
+                        js = await r.json()
+                        if isinstance(js, dict):
+                            context.output = 'Video not found'
+                            return
+                        url = js[0]['url']
+                        context.output = 'Playing'
+                        source = discord.FFmpegPCMAudio(url)
+                        vc.play(source)
+                # yt = YouTube(yt_url)
+                # video = yt.streams.filter(only_audio=True, audio_codec='opus').first()
+                # video_url = video.url
+                # print(video_url)
+                # source = discord.FFmpegPCMAudio(video_url)
+                # vc.play(source)
                 return
             if cmd == 'play':
                 author = context.message.author
