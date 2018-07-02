@@ -110,7 +110,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
                             voice_msg = voice_msg.replace('<{}{}>'.format(*m), g.name)
                 file = 'tts/'+hashlib.md5(voice_msg.encode()).hexdigest()+".mp3"
                 if not os.path.exists(file):
-                    tts = gTTS(text=voice_msg, lang='en-au')
+                    tts = gTTS(text=voice_msg, lang='en-us')
                     tts.save(file)
                 source = discord.FFmpegPCMAudio(file)
                 if guild.voice_client.is_playing() == False:
