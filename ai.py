@@ -71,6 +71,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
                 try:
                     # Execute the intent module
                     await intent.handle(context)
+                    context.voice = context.output
                 except Exception:
                     failed = True
                     await msg.channel.send('`There was an error when handling that request`')
