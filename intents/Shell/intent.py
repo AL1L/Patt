@@ -103,6 +103,9 @@ class Intent(u.Intent):
                 source = discord.FFmpegPCMAudio(video_url)
                 vc.play(source)
                 return
+            if cmd == 'say':
+                context.output = cmd[3:].strip()
+                return
             output = ""
             try:
                 if cmd.startswith('eval '):

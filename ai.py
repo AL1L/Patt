@@ -71,14 +71,13 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
                 try:
                     # Execute the intent module
                     await intent.handle(context)
-                    context.voice = context.output
                 except Exception:
                     failed = True
                     await msg.channel.send('`There was an error when handling that request`')
                     error = traceback.format_exc()
                     print(error)
         rtn = context.output
-    
+
     print('TO [{}] < {}'.format(author.id, rtn))
     if rtn is '' or rtn is None:
         rtn = ' '
@@ -89,6 +88,8 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
             await msg.channel.send(rtn, embed=context.output_embed)
     else:
         await msg.channel.send(rtn)
+
+    context.voice = rtn
 
     voice = False
     # say in voice
