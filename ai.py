@@ -13,6 +13,7 @@ import os
 import hashlib
 import re
 
+
 async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
     failed = False
     author: discord.Member = msg.author
@@ -92,15 +93,18 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
                 voice_msg = context.voice.replace('`', '')
                 p = re.compile("<(#|@[!]?|&)(\d{18})>")
                 for m in p.findall(voice_msg):
-                    if m[0] == "@" or m[0   ] == "@!":
+                    if m[0] == "@" or m[0] == "@!":
                         g = patt.client.get_user(int(m[1]))
                         if g is not None:
-                            voice_msg = voice_msg.replace('<{}{}>'.format(*m), g.display_name)
+                            voice_msg = voice_msg.replace(
+                                '<{}{}>'.format(*m), g.display_name)
                     elif m[0] == '#':
                         g = patt.client.get_channel(int(m[1]))
                         if g is not None:
-                            voice_msg = voice_msg.replace('<{}{}>'.format(*m), g.name)
-                file = 'tts/'+hashlib.md5(voice_msg.encode()).hexdigest()+".mp3"
+                            voice_msg = voice_msg.replace(
+                                '<{}{}>'.format(*m), g.name)
+                file = 'tts/' + \
+                    hashlib.md5(voice_msg.encode()).hexdigest()+".mp3"
                 if not os.path.exists(file):
                     tts = gTTS(text=voice_msg, lang='en-us')
                     tts.save(file)
@@ -112,7 +116,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
                 failed = True
                 error = traceback.format_exc()
                 print(error)
-        
+
     # Log
 
     if context is not None and patt.log_channel is not None:
@@ -172,8 +176,9 @@ async def get_query_text(patt: u.Patt, msg: discord.Message):
         id = m.group(2)
 
         query = query.replace(m.group(0), '{};{}'.format(mention_type, id))
-    
+
     return query
+
 
 async def handle_payload(json: dict, context: u.IntentContext):
     # print(jsonlib.dumps(json))
@@ -191,6 +196,21 @@ async def handle_payload(json: dict, context: u.IntentContext):
         payload = msg['payload']
     if payload is None:
         return True
+
+    # Replace mentions
+
+    for m in re.finditer(r"(user|channel|role);([0-9]{18})", context.output):
+        mention_type = m.group(1)
+        if mention_type == 'user':
+            mention_type = '@'
+        elif mention_type == 'role':
+            mention_type = '@&'
+        elif mention_type == 'channel':
+            mention_type = '#'
+        id = m.group(2)
+
+        context.output = context.output.replace(
+            m.group(0), '<{}{}>'.format(mention_type, id))
 
     # Do stuff
     if 'nsfw' in payload and not context.message.channel.is_nsfw():
