@@ -19,15 +19,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
     guild: discord.Guild = msg.guild
     channel: discord.Channel = msg.channel
     type: discord.MessageType = msg.type
-    query = msg.content \
-        .replace('<@{}>'.format(patt.client.user.id), '') \
-        .replace('<@!{}>'.format(patt.client.user.id), '') \
-        .replace(',', '') \
-        .replace('.', '') \
-        .replace('?', '') \
-        .replace('!', '') \
-        .replace('`', '') \
-        .strip()
+    query = await get_query_text(patt, msg)
     print('FR [{}] > {}'.format(author.id, query))
     ai = apiai.ApiAI(patt.apiai_token)
     request = ai.text_request()
@@ -154,6 +146,34 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
             color = discord.Colour.red()
         await u.log(patt, dic, title="Got message", content=content, color=color, footer="\U000023F3 Took {}ms".format(time_took), author=author, thumbnail=thumb)
 
+
+async def get_query_text(patt: u.Patt, msg: discord.Message):
+
+    # Remove punctuation and patt mentions
+    query = msg.content \
+        .replace('<@{}>'.format(patt.client.user.id), '') \
+        .replace('<@!{}>'.format(patt.client.user.id), '') \
+        .replace(',', '') \
+        .replace('.', '') \
+        .replace('?', '') \
+        .replace('!', '') \
+        .replace('`', '') \
+        .strip()
+
+    # Replace all mentions to new format
+    for m in re.finditer(r"<(@&|@!?|#)([0-9]{18})>", query):
+        mention_type = m.group(1)
+        if mention_type == '@' or mention_type == '@!':
+            mention_type = 'user'
+        elif mention_type == '@&':
+            mention_type = 'role'
+        elif mention_type == '#':
+            mention_type = 'channel'
+        id = m.group(2)
+
+        query = query.replace(m.group(0), '{};{}'.format(mention_type, id))
+    
+    return query
 
 async def handle_payload(json: dict, context: u.IntentContext):
     # print(jsonlib.dumps(json))
