@@ -18,7 +18,7 @@ async def on_message(patt: u.Patt, msg: discord.Message, start_time: int):
     failed = False
     author: discord.Member = msg.author
     
-    if author.id === 464268912687579136:
+    if author.id == 464268912687579136:
         await msg.channel.send(u"You've been very mean to me, so I'm not going to talk to you. 🤐")
         return
     
